@@ -1,4 +1,6 @@
 package org.inzight.controller;
+import org.inzight.dto.request.UserRequestDTO;
+import org.inzight.dto.response.UserResponseDTO;
 import org.inzight.entity.User;
 import org.inzight.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -16,23 +18,23 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Long id) {
+    public UserResponseDTO getUser(@PathVariable Long id) {
         return userService.getUser(id);
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public UserResponseDTO createUser(@RequestBody UserRequestDTO request) {
+        return userService.createUser(request);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.updateUser(id, user);
+    public UserResponseDTO updateUser(@PathVariable Long id, @RequestBody UserRequestDTO request) {
+        return userService.updateUser(id, request);
     }
 
     @DeleteMapping("/{id}")
