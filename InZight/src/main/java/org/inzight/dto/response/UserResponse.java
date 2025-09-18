@@ -1,12 +1,12 @@
-package org.inzight.dto.request;
-
+package org.inzight.dto.response;
 
 import lombok.Data;
 
 @Data
-public class UserRequestDTO {
+public class UserResponse {
+    private Long id;
     private String username;
-    private String password;
     private String email;
     private String fullName;
+    private String avatarUrl;
 }
