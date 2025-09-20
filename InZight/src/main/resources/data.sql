@@ -1,8 +1,8 @@
 -- USERS
 INSERT INTO users (username, email, password, full_name, avatar_url) VALUES
-                                         ('alice', 'alice@example.com', '12345', 'Alice Nguyen', 'https://i.pravatar.cc/150?img=1'),
-                                         ('bob',   'bob@example.com',   '12345', 'Bob Tran',    'https://i.pravatar.cc/150?img=2'),
-                                         ('charlie','charlie@example.com','12345','Charlie Pham','https://i.pravatar.cc/150?img=3');
+                                         ('alice', 'alice@example.com', '2a$10$7qTjZVr0t4A0fHw6/NlOUO4SgJHmbvC5FbyhpzVdT5a5eTzq7UwqC', 'Alice Nguyen', 'https://i.pravatar.cc/150?img=1'),
+                                         ('bob',   'bob@example.com',   '2a$10$7qTjZVr0t4A0fHw6/NlOUO4SgJHmbvC5FbyhpzVdT5a5eTzq7UwqC', 'Bob Tran',    'https://i.pravatar.cc/150?img=2'),
+                                         ('charlie','charlie@example.com','2a$10$7qTjZVr0t4A0fHw6/NlOUO4SgJHmbvC5FbyhpzVdT5a5eTzq7UwqC','Charlie Pham','https://i.pravatar.cc/150?img=3');
 
 -- CATEGORIES
 INSERT INTO categories (name, type) VALUES
