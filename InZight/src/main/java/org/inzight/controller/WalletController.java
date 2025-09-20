@@ -2,8 +2,8 @@ package org.inzight.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.inzight.entity.Budget;
-import org.inzight.service.BudgetService;
+import org.inzight.entity.Wallet;
+import org.inzight.service.WalletService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,36 +12,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/budgets")
+@RequestMapping("/api/wallets")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth") // ✅ yêu cầu JWT
-public class BudgetController {
+public class WalletController {
 
-    private final BudgetService budgetService;
+    private final WalletService walletService;
 
     @GetMapping
-    public ResponseEntity<List<Budget>> getBudgets(@AuthenticationPrincipal UserDetails user) {
-        return ResponseEntity.ok(budgetService.getBudgetsByUser(getUserId(user)));
+    public ResponseEntity<List<Wallet>> getWallets(@AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(walletService.getWalletsByUser(getUserId(user)));
     }
 
     @PostMapping
-    public ResponseEntity<Budget> createBudget(@RequestBody Budget budget,
+    public ResponseEntity<Wallet> createWallet(@RequestBody Wallet wallet,
                                                @AuthenticationPrincipal UserDetails user) {
-        budget.setId(getUserId(user));
-        return ResponseEntity.ok(budgetService.createBudget(budget));
+        wallet.setId(getUserId(user));
+        return ResponseEntity.ok(walletService.createWallet(wallet));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Budget> updateBudget(@PathVariable Long id, @RequestBody Budget budget) {
-        return ResponseEntity.ok(budgetService.updateBudget(id, budget));
+    public ResponseEntity<Wallet> updateWallet(@PathVariable Long id, @RequestBody Wallet wallet) {
+        return ResponseEntity.ok(walletService.updateWallet(id, wallet));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBudget(@PathVariable Long id) {
-        budgetService.deleteBudget(id);
+    public ResponseEntity<Void> deleteWallet(@PathVariable Long id) {
+        walletService.deleteWallet(id);
         return ResponseEntity.noContent().build();
     }
 
+    // TODO: map username -> userId (tạm fix cứng để test)
     private Long getUserId(UserDetails user) {
         if (user.getUsername().equals("alice")) return 1L;
         if (user.getUsername().equals("bob")) return 2L;
