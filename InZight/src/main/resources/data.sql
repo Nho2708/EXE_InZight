@@ -1,8 +1,9 @@
+
 -- USERS
 INSERT INTO users (username, email, password, full_name, avatar_url) VALUES
-                                         ('alice', 'alice@example.com', '2a$10$7qTjZVr0t4A0fHw6/NlOUO4SgJHmbvC5FbyhpzVdT5a5eTzq7UwqC', 'Alice Nguyen', 'https://i.pravatar.cc/150?img=1'),
-                                         ('bob',   'bob@example.com',   '2a$10$7qTjZVr0t4A0fHw6/NlOUO4SgJHmbvC5FbyhpzVdT5a5eTzq7UwqC', 'Bob Tran',    'https://i.pravatar.cc/150?img=2'),
-                                         ('charlie','charlie@example.com','2a$10$7qTjZVr0t4A0fHw6/NlOUO4SgJHmbvC5FbyhpzVdT5a5eTzq7UwqC','Charlie Pham','https://i.pravatar.cc/150?img=3');
+                                                                         ('alice', 'alice@example.com', '2a$10$7qTjZVr0t4A0fHw6/NlOUO4SgJHmbvC5FbyhpzVdT5a5eTzq7UwqC', 'Alice Nguyen', 'https://i.pravatar.cc/150?img=1'),
+                                                                         ('bob',   'bob@example.com',   '2a$10$7qTjZVr0t4A0fHw6/NlOUO4SgJHmbvC5FbyhpzVdT5a5eTzq7UwqC', 'Bob Tran',    'https://i.pravatar.cc/150?img=2'),
+                                                                         ('charlie','charlie@example.com','2a$10$7qTjZVr0t4A0fHw6/NlOUO4SgJHmbvC5FbyhpzVdT5a5eTzq7UwqC','Charlie Pham','https://i.pravatar.cc/150?img=3');
 
 -- CATEGORIES
 INSERT INTO categories (name, type) VALUES
@@ -27,10 +28,10 @@ INSERT INTO transactions (wallet_id, category_id, amount, type, note) VALUES
                                                                           (2, 3, 300000, 'EXPENSE', 'Mua sách'),
                                                                           (3, 6, 50, 'INCOME', 'Tiền thưởng dự án');
 
--- BUDGETS
-INSERT INTO budgets (user_id, category_id, amount_limit, start_date, end_date) VALUES
-                                                                                   (1, 1, 2000000, '2025-09-01', '2025-09-30'),
-                                                                                   (1, 2, 1000000, '2025-09-01', '2025-09-30');
+-- BUDGETS (có thêm budget_name)
+INSERT INTO budgets (user_id, category_id, budget_name, amount_limit, start_date, end_date) VALUES
+                                                                                                (1, 1, 'Ăn uống tháng 9', 2000000, '2025-09-01', '2025-09-30'),
+                                                                                                (1, 2, 'Đi lại tháng 9',  1000000, '2025-09-01', '2025-09-30');
 
 -- FRIENDS
 INSERT INTO friends (user_id, friend_id, status) VALUES
