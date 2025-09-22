@@ -22,6 +22,8 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(2001, "Category not found", HttpStatus.NOT_FOUND),
     CATEGORY_NAME_EXIST(2002, "Category name already exists", HttpStatus.CONFLICT),
 
+    ///  Budget
+    BUDGET_NOT_FOUND(3001, "Budget not found", HttpStatus.NOT_FOUND),
     /// General
     INVALID_REQUEST(9001, "Invalid request", HttpStatus.BAD_REQUEST);
 
@@ -34,4 +36,6 @@ public enum ErrorCode {
     int code;
     String message;
     HttpStatusCode statusCode;
+
+
 }

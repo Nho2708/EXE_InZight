@@ -2,49 +2,47 @@ package org.inzight.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-
+@Entity
+@Table(name = "budgets")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Entity
-@Table(name = "budgets",
-        indexes = {
-                @Index(name = "idx_budget_user", columnList = "user_id"),
-                @Index(name = "idx_budget_category", columnList = "category_id")
-        })
-public class Budget extends BaseEntity {
-
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class Budget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
+    @Column(name = "user_id", nullable = false)
+    Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "category_id", nullable = false)
+    Long categoryId;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
-
-    @Column(name = "amount_limit", nullable = false, precision = 15, scale = 2)
-    private BigDecimal amountLimit;
-
+    @Column(name = "amount_limit", nullable = false)
+    BigDecimal amountLimit;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
-
+    LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
+    LocalDate endDate;
+
+    @Column(name = "created_at", updatable = false, insertable = false)
+    LocalDateTime createdAt;
+
+    @Column(name = "updated_at", insertable = false)
+    LocalDateTime updatedAt;
+
+    @Column(name = "budget_name", nullable = false)
+    String budgetName;
 }
