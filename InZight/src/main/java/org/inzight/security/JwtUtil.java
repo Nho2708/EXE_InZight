@@ -35,6 +35,7 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
+
     // Validate token
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
