@@ -138,6 +138,27 @@ public class TransactionService {
             throw new RuntimeException("Failed to delete transaction: " + e.getMessage(), e);
         }
     }
+    public List<Transaction> getTransactionsByUserAndType(String type) {
+        Long currentUserId = authUtil.getCurrentUserId();
+
+        if (type == null || type.isBlank()) {
+            // lấy tất cả giao dịch của user
+            return transactionRepository.findByWalletUserId(currentUserId);
+        }
+
+        TransactionType transactionType;
+        try {
+            transactionType = TransactionType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid transaction type: " + type);
+        }
+
+        return transactionRepository.findByWalletUserIdAndType(currentUserId, transactionType);
+    }
+    public List<Transaction> getTransactions() {
+        Long currentUserId = authUtil.getCurrentUserId();
+        return transactionRepository.findByWalletUserId(currentUserId);
+    }
 }
 
 

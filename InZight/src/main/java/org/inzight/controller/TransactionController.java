@@ -18,6 +18,18 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    // Lấy transaction của user theo income hoặc expense
+    @GetMapping
+    public ResponseEntity<List<Transaction>> getTransactions(
+            @RequestParam(required = false) String type) {
+        return ResponseEntity.ok(transactionService.getTransactionsByUserAndType(type));
+    }
+    // get all transaction cua user
+    @GetMapping("/all")
+    public ResponseEntity<List<Transaction>> getTransactions(){
+        return ResponseEntity.ok(transactionService.getTransactions());
+    }
+
     // ✅ Thêm mới transaction (chi tiêu hoặc thu nhập)
     @PostMapping
     public ResponseEntity<Transaction> createTransaction(@RequestBody TransactionRequest request) {
