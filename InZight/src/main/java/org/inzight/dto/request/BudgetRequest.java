@@ -15,8 +15,8 @@ import java.time.LocalDate;
 public class BudgetRequest {
     Long userId;
     Long categoryId;
+    String budgetName;
     BigDecimal amountLimit;
     LocalDate startDate;
     LocalDate endDate;
-    String budgetName;
 }

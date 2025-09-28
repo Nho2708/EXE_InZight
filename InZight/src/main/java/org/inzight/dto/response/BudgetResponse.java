@@ -17,10 +17,10 @@ public class BudgetResponse {
     Long id;
     Long userId;
     Long categoryId;
+    String budgetName;
     BigDecimal amountLimit;
     LocalDate startDate;
     LocalDate endDate;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    String budgetName;
 }

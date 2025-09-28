@@ -28,6 +28,9 @@ public class Budget {
     @Column(name = "category_id", nullable = false)
     Long categoryId;
 
+    @Column(name = "budget_name", nullable = false)
+    String budgetName;
+
     @Column(name = "amount_limit", nullable = false)
     BigDecimal amountLimit;
 
@@ -43,6 +46,5 @@ public class Budget {
     @Column(name = "updated_at", insertable = false)
     LocalDateTime updatedAt;
 
-    @Column(name = "budget_name", nullable = false)
-    String budgetName;
+
 }
