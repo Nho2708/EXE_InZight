@@ -1,15 +1,15 @@
 package org.inzight.service;
 
 import lombok.RequiredArgsConstructor;
+import org.inzight.dto.request.WalletRequest;
 import org.inzight.entity.Wallet;
+import org.inzight.mapper.WalletMapper;
 import org.inzight.repository.WalletRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-
 public class WalletService {
 
     private final WalletRepository walletRepository;
@@ -22,12 +22,12 @@ public class WalletService {
         return walletRepository.save(wallet);
     }
 
-    public Wallet updateWallet(Long id, Wallet wallet) {
+    public Wallet updateWallet(Long id, WalletRequest request, WalletMapper mapper) {
         Wallet existing = walletRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
-        existing.setName(wallet.getName());
-        existing.setBalance(wallet.getBalance());
-        existing.setCurrency(wallet.getCurrency());
+        existing.setName(request.getName());
+        existing.setBalance(request.getBalance());
+        existing.setCurrency(request.getCurrency());
         return walletRepository.save(existing);
     }
 
