@@ -110,6 +110,13 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         return postMapper.toResponse(post);
     }
+    public List<PostResponse> getMyPosts() {
+        Long currentUserId = authUtil.getCurrentUserId();
+        List<Post> posts = postRepository.findByUserId(currentUserId);
+        return posts.stream()
+                .map(postMapper::toResponse)
+                .toList();
+    }
 }
 
 

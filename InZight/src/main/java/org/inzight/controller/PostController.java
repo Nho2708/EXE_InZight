@@ -41,6 +41,12 @@ public class PostController {
         return ResponseEntity.ok(postService.getAll());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<List<PostResponse>> getMyPosts() {
+        List<PostResponse> posts = postService.getMyPosts();
+        return ResponseEntity.ok(posts);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         postService.deletePost(id);

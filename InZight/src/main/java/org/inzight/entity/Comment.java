@@ -39,4 +39,5 @@ public class Comment extends BaseEntity {
     @Lob
     @Column(nullable = false)
     private String content;
+
 }
