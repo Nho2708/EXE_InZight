@@ -1,7 +1,9 @@
 package org.inzight.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.inzight.dto.request.TransactionRequest;
+import org.inzight.dto.response.StatisticResponse;
 import org.inzight.entity.Transaction;
 import org.inzight.service.TransactionService;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/transactions")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -47,6 +50,12 @@ public class TransactionController {
         transactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<StatisticResponse> getStatistics(@RequestParam String type) {
+        return ResponseEntity.ok(transactionService.getStatistics(type));
+    }
+
 
 //    // ✅ Sửa transaction
 //    @PutMapping("/{id}")

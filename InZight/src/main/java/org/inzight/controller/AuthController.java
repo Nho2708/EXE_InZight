@@ -57,7 +57,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(request.username(), request.password())
             );
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal(); // ✅ dùng UserDetails
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String token = jwtUtil.generateToken(userDetails);
 
             Map<String, Object> response = new HashMap<>();
@@ -68,8 +68,13 @@ public class AuthController {
 
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Sai username hoặc password!");
+        } catch (Exception e) {
+            // 👇 thêm log lỗi chi tiết
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Lỗi server: " + e.getMessage());
         }
     }
+
 
     // DTOs cho request
     public record RegisterRequest(String username, String email, String password, String fullName) {}

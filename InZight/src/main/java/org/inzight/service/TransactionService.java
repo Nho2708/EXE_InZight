@@ -4,22 +4,27 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.inzight.dto.request.TransactionRequest;
+import org.inzight.dto.response.CategoryStatistic;
+import org.inzight.dto.response.StatisticResponse;
 import org.inzight.entity.Category;
 import org.inzight.entity.Transaction;
-import org.inzight.entity.User;
+
 import org.inzight.entity.Wallet;
 import org.inzight.enums.TransactionType;
 import org.inzight.repository.CategoryRepository;
-import org.inzight.repository.UserRepository;
+
 import org.inzight.repository.TransactionRepository;
 import org.inzight.repository.WalletRepository;
 import org.inzight.security.AuthUtil;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -159,6 +164,52 @@ public class TransactionService {
         Long currentUserId = authUtil.getCurrentUserId();
         return transactionRepository.findByWalletUserId(currentUserId);
     }
+
+    public StatisticResponse getStatistics(String type) {
+        Long currentUserId = authUtil.getCurrentUserId();
+
+        // lấy toàn bộ transaction theo user và type
+        TransactionType transactionType = TransactionType.valueOf(type.toUpperCase());
+        List<Transaction> transactions =
+                transactionRepository.findByWalletUserIdAndType(currentUserId, transactionType);
+
+        if (transactions.isEmpty()) {
+            return new StatisticResponse(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, List.of());
+        }
+
+        // Tính tổng
+        BigDecimal total = transactions.stream()
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Group by Category name
+        Map<String, BigDecimal> groupByCategory = transactions.stream()
+                .collect(Collectors.groupingBy(
+                        tx -> tx.getCategory().getName(),
+                        Collectors.mapping(Transaction::getAmount,
+                                Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                ));
+
+        // Tạo list CategoryStatistic
+        List<CategoryStatistic> categories = groupByCategory.entrySet().stream()
+                .map(e -> {
+                    double percent = total.compareTo(BigDecimal.ZERO) > 0
+                            ? e.getValue().doubleValue() * 100.0 / total.doubleValue()
+                            : 0.0;
+                    return new CategoryStatistic(e.getKey(), e.getValue(), percent);
+                })
+                .collect(Collectors.toList());
+
+        // Gán vào response
+        if (transactionType == TransactionType.EXPENSE) {
+            return new StatisticResponse(total, BigDecimal.ZERO, BigDecimal.ZERO, categories);
+        } else {
+            return new StatisticResponse(BigDecimal.ZERO, total, BigDecimal.ZERO, categories);
+        }
+    }
+
+
+
 }
 
 
