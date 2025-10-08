@@ -61,7 +61,7 @@ public class TransactionService {
 
             // update balance
             if (transaction.getType() == TransactionType.INCOME) {
-                wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
+                wallet.setBalance(wallet.getBalance().add(transaction.getAmount()))git ;
             } else {
                 wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
             }

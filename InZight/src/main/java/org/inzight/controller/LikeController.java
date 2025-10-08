@@ -16,6 +16,7 @@ public class LikeController {
     private final LikeService likeService;
 
 
+    // like or unlike
     @PostMapping("/{postId}/like")
     public ResponseEntity<String> toggleLike(@PathVariable Long postId) {
         boolean liked = likeService.toggleLike(postId);
@@ -24,13 +25,13 @@ public class LikeController {
                 : ResponseEntity.ok("Post unliked");
     }
 
-
+    // get counts like
     @GetMapping("/{postId}/likes/count")
     public ResponseEntity<Long> getLikeCount(@PathVariable Long postId) {
         return ResponseEntity.ok(likeService.getLikeCount(postId));
     }
 
-
+    // get all like with username
     @GetMapping("/{postId}/likes") // get like kem UserName
     public ResponseEntity<List<LikeResponse>> getLikes(@PathVariable Long postId) {
         return ResponseEntity.ok(likeService.getLikes(postId));

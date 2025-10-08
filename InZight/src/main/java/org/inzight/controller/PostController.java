@@ -21,32 +21,34 @@ public class PostController {
 
     private final PostService postService;
 
+    // add post
     @PostMapping
     public ResponseEntity<PostResponse> create(@RequestBody PostRequest request) {
         return ResponseEntity.ok(postService.createPost(request));
     }
+    // edit post
     @PutMapping("/{id}")
     public ResponseEntity<PostResponse> updatePost(@PathVariable("id") Long id,
                                                    @RequestBody PostRequest request) {
         return ResponseEntity.ok(postService.updatePost(id, request));
     }
-
+    // get post by id
     @GetMapping("/{id}")
     public ResponseEntity<PostResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(postService.getById(id));
     }
-
+    // get all post
     @GetMapping
     public ResponseEntity<List<PostResponse>> getAll() {
         return ResponseEntity.ok(postService.getAll());
     }
-
+    // get user's post
     @GetMapping("/me")
     public ResponseEntity<List<PostResponse>> getMyPosts() {
         List<PostResponse> posts = postService.getMyPosts();
         return ResponseEntity.ok(posts);
     }
-
+    // delete post
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         postService.deletePost(id);

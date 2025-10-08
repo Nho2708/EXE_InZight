@@ -15,6 +15,8 @@ import java.util.List;
 public class ShareController {
     private final ShareService shareService;
 
+
+    // share or unshare
     @PostMapping("/{postId}")
     public ResponseEntity<String> sharePost(@PathVariable Long postId) {
         boolean shared = shareService.toggleShare(postId);
@@ -22,13 +24,13 @@ public class ShareController {
                 ? ResponseEntity.ok("Post shared")
                 : ResponseEntity.ok("Post unshared");
     }
-
+    // get counts share
     @GetMapping("/{postId}/count")
     public ResponseEntity<Long> getShareCount(@PathVariable Long postId) {
         return ResponseEntity.ok(shareService.getShareCount(postId));
     }
-
-    @GetMapping("/{postId}/shares") // get like kem UserName
+    // get all share with username
+    @GetMapping("/{postId}/shares")
     public ResponseEntity<List<ShareResponse>> getShares(@PathVariable Long postId) {
         return ResponseEntity.ok(shareService.getShares(postId));
     }
