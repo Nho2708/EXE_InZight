@@ -32,8 +32,12 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<TransactionResponse> createTransaction(@RequestBody TransactionRequest request) {
-        return ResponseEntity.ok(transactionService.createTransaction(request));
+        TransactionResponse response = transactionService.createTransaction(request);
+        System.out.println("TransactionResponse JSON: " + response);
+        return ResponseEntity.ok(response);
     }
+
+
 
     @PutMapping("/{id}")
     public ResponseEntity<TransactionResponse> updateTransaction(

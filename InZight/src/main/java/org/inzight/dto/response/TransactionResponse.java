@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,7 +15,7 @@ public class TransactionResponse {
     private String categoryName;
     private String walletName;
     private BigDecimal amount;
-    private String type; // "INCOME" | "EXPENSE"
+    private String type; // INCOME | EXPENSE
     private String note;
     private LocalDateTime transactionDate;
 }

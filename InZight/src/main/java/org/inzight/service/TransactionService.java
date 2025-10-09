@@ -36,43 +36,37 @@ public class TransactionService {
 
     @Transactional
     public TransactionResponse createTransaction(TransactionRequest request) {
-        try {
-            Long currentUserId = authUtil.getCurrentUserId();
-            Wallet wallet = walletRepository.findById(request.getWalletId())
-                    .orElseThrow(() -> new RuntimeException("Wallet not found"));
+        Long currentUserId = authUtil.getCurrentUserId();
+        Wallet wallet = walletRepository.findById(request.getWalletId())
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+        if (!wallet.getUser().getId().equals(currentUserId))
+            throw new RuntimeException("Unauthorized: Wallet does not belong to you");
 
-            if (!wallet.getUser().getId().equals(currentUserId)) {
-                throw new RuntimeException("Unauthorized: Wallet does not belong to you");
-            }
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
 
-            Category category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
+        Transaction transaction = Transaction.builder()
+                .wallet(wallet)
+                .category(category)
+                .amount(request.getAmount())
+                .type(TransactionType.valueOf(request.getType()))
+                .note(request.getNote())
+                .build();
 
-            Transaction transaction = Transaction.builder()
-                    .wallet(wallet)
-                    .category(category)
-                    .amount(request.getAmount())
-                    .type(TransactionType.valueOf(request.getType()))
-                    .note(request.getNote())
-                    .build();
+        // Update wallet balance
+        if (transaction.getType() == TransactionType.INCOME)
+            wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
+        else
+            wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
 
-            // Cập nhật số dư ví
-            if (transaction.getType() == TransactionType.INCOME) {
-                wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
-            } else {
-                wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
-            }
+        walletRepository.save(wallet);
+        Transaction saved = transactionRepository.save(transaction);
 
-            walletRepository.save(wallet);
-            transactionRepository.save(transaction);
-
-            return transactionMapper.toResponse(transaction);
-
-        } catch (Exception e) {
-            log.error("Error creating transaction", e);
-            throw new RuntimeException("Failed to create transaction: " + e.getMessage(), e);
-        }
+        TransactionResponse response = transactionMapper.toResponse(saved);
+        log.info(" Returning transaction response: {}", response);
+        return response;
     }
+
 
     @Transactional
     public TransactionResponse updateTransaction(Long transactionId, TransactionRequest request) {

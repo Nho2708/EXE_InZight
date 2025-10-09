@@ -1,11 +1,16 @@
 package org.inzight.dto.request;
 
 
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TransactionRequest {
     private Long walletId;
     private Long categoryId;
