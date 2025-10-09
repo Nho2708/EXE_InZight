@@ -58,4 +58,17 @@ public class JwtUtil {
                 .getBody();
         return claimsResolver.apply(claims);
     }
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("❌ Invalid JWT: " + e.getMessage());
+            return false;
+        }
+    }
+
 }

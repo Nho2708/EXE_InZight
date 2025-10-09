@@ -1,5 +1,8 @@
 package org.inzight.config;
 
+import lombok.RequiredArgsConstructor;
+import org.inzight.security.JwtHandshakeInterceptor;
+import org.inzight.security.JwtUtil;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -8,11 +11,17 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    private final JwtUtil jwtUtil;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Đây là endpoint FE sẽ connect tới: /ws
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
+        registry.addEndpoint("/ws")
+                .addInterceptors(new JwtHandshakeInterceptor(jwtUtil)) // ✅ Thêm interceptor kiểm JWT
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 
     @Override
