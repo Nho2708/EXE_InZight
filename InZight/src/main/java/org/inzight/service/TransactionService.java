@@ -6,21 +6,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.inzight.dto.request.TransactionRequest;
 import org.inzight.dto.response.CategoryStatistic;
 import org.inzight.dto.response.StatisticResponse;
+import org.inzight.dto.response.TransactionResponse;
 import org.inzight.entity.Category;
 import org.inzight.entity.Transaction;
-
 import org.inzight.entity.Wallet;
 import org.inzight.enums.TransactionType;
+import org.inzight.mapper.TransactionMapper;
 import org.inzight.repository.CategoryRepository;
-
 import org.inzight.repository.TransactionRepository;
 import org.inzight.repository.WalletRepository;
 import org.inzight.security.AuthUtil;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,13 +31,12 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
     private final CategoryRepository categoryRepository;
+    private final TransactionMapper transactionMapper;
     private final AuthUtil authUtil;
 
     @Transactional
-    public Transaction createTransaction(TransactionRequest request) {
+    public TransactionResponse createTransaction(TransactionRequest request) {
         try {
-
-
             Long currentUserId = authUtil.getCurrentUserId();
             Wallet wallet = walletRepository.findById(request.getWalletId())
                     .orElseThrow(() -> new RuntimeException("Wallet not found"));
@@ -59,22 +56,26 @@ public class TransactionService {
                     .note(request.getNote())
                     .build();
 
-            // update balance
+            // Cập nhật số dư ví
             if (transaction.getType() == TransactionType.INCOME) {
-                wallet.setBalance(wallet.getBalance().add(transaction.getAmount())) ;
+                wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
             } else {
                 wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
             }
 
             walletRepository.save(wallet);
-            return transactionRepository.save(transaction);
+            transactionRepository.save(transaction);
+
+            return transactionMapper.toResponse(transaction);
+
         } catch (Exception e) {
             log.error("Error creating transaction", e);
             throw new RuntimeException("Failed to create transaction: " + e.getMessage(), e);
         }
     }
+
     @Transactional
-    public Transaction updateTransaction(Long transactionId, TransactionRequest request) {
+    public TransactionResponse updateTransaction(Long transactionId, TransactionRequest request) {
         try {
             Long currentUserId = authUtil.getCurrentUserId();
 
@@ -93,7 +94,6 @@ public class TransactionService {
                 wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
             }
 
-            // update category
             Category category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
 
@@ -101,7 +101,6 @@ public class TransactionService {
             transaction.setAmount(request.getAmount());
             transaction.setType(TransactionType.valueOf(request.getType()));
             transaction.setNote(request.getNote());
-
 
             // apply new balance
             if (transaction.getType() == TransactionType.INCOME) {
@@ -111,12 +110,16 @@ public class TransactionService {
             }
 
             walletRepository.save(wallet);
-            return transactionRepository.save(transaction);
+            transactionRepository.save(transaction);
+
+            return transactionMapper.toResponse(transaction);
+
         } catch (Exception e) {
             log.error("Error updating transaction", e);
             throw new RuntimeException("Failed to update transaction: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     public void deleteTransaction(Long transactionId) {
         try {
@@ -138,37 +141,45 @@ public class TransactionService {
 
             walletRepository.save(wallet);
             transactionRepository.delete(transaction);
+
         } catch (Exception e) {
             log.error("Error deleting transaction", e);
             throw new RuntimeException("Failed to delete transaction: " + e.getMessage(), e);
         }
     }
-    public List<Transaction> getTransactionsByUserAndType(String type) {
+
+    public List<TransactionResponse> getTransactionsByUserAndType(String type) {
         Long currentUserId = authUtil.getCurrentUserId();
 
+        List<Transaction> transactions;
         if (type == null || type.isBlank()) {
-            // lấy tất cả giao dịch của user
-            return transactionRepository.findByWalletUserId(currentUserId);
+            transactions = transactionRepository.findByWalletUserId(currentUserId);
+        } else {
+            TransactionType transactionType;
+            try {
+                transactionType = TransactionType.valueOf(type.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid transaction type: " + type);
+            }
+            transactions = transactionRepository.findByWalletUserIdAndType(currentUserId, transactionType);
         }
 
-        TransactionType transactionType;
-        try {
-            transactionType = TransactionType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid transaction type: " + type);
-        }
-
-        return transactionRepository.findByWalletUserIdAndType(currentUserId, transactionType);
+        return transactions.stream()
+                .map(transactionMapper::toResponse)
+                .toList();
     }
-    public List<Transaction> getTransactions() {
+
+    public List<TransactionResponse> getTransactions() {
         Long currentUserId = authUtil.getCurrentUserId();
-        return transactionRepository.findByWalletUserId(currentUserId);
+        return transactionRepository.findByWalletUserId(currentUserId)
+                .stream()
+                .map(transactionMapper::toResponse)
+                .toList();
     }
 
     public StatisticResponse getStatistics(String type) {
         Long currentUserId = authUtil.getCurrentUserId();
 
-        // lấy toàn bộ transaction theo user và type
         TransactionType transactionType = TransactionType.valueOf(type.toUpperCase());
         List<Transaction> transactions =
                 transactionRepository.findByWalletUserIdAndType(currentUserId, transactionType);
@@ -177,12 +188,10 @@ public class TransactionService {
             return new StatisticResponse(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, List.of());
         }
 
-        // Tính tổng
         BigDecimal total = transactions.stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Group by Category name
         Map<String, BigDecimal> groupByCategory = transactions.stream()
                 .collect(Collectors.groupingBy(
                         tx -> tx.getCategory().getName(),
@@ -190,7 +199,6 @@ public class TransactionService {
                                 Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
                 ));
 
-        // Tạo list CategoryStatistic
         List<CategoryStatistic> categories = groupByCategory.entrySet().stream()
                 .map(e -> {
                     double percent = total.compareTo(BigDecimal.ZERO) > 0
@@ -198,54 +206,12 @@ public class TransactionService {
                             : 0.0;
                     return new CategoryStatistic(e.getKey(), e.getValue(), percent);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
-        // Gán vào response
         if (transactionType == TransactionType.EXPENSE) {
             return new StatisticResponse(total, BigDecimal.ZERO, BigDecimal.ZERO, categories);
         } else {
             return new StatisticResponse(BigDecimal.ZERO, total, BigDecimal.ZERO, categories);
         }
     }
-
-
-
 }
-
-
-//    public Transaction createTransaction(Transaction transaction, UserDetails user) {
-//        // kiểm tra wallet thuộc về user
-//        var wallet = walletRepository.findById(transaction.getId())
-//                .orElseThrow(() -> new RuntimeException("Wallet not found"));
-//        // TODO: check wallet.getUserId() == currentUserId
-//        return transactionRepository.save(transaction);
-//    }
-//
-//    public Transaction updateTransaction(Long id, Transaction transaction, UserDetails user) {
-//        Transaction existing = transactionRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Transaction not found"));
-//        // TODO: check quyền sở hữu
-//        existing.setAmount(transaction.getAmount());
-//        existing.setNote(transaction.getNote());
-//        existing.setId(transaction.getId());
-//        existing.setType(transaction.getType());
-//        existing.setTransactionDate(transaction.getTransactionDate());
-//        return transactionRepository.save(existing);
-//    }
-//
-//    public List<Transaction> getTransactionsByWallet(Long walletId, UserDetails user) {
-//        // TODO: check quyền sở hữu
-//        return transactionRepository.findByWalletId(walletId);
-//    }
-//
-//    public Transaction getTransaction(Long id, UserDetails user) {
-//        return transactionRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Transaction not found"));
-//    }
-//
-//    public void deleteTransaction(Long id, UserDetails user) {
-//        Transaction existing = transactionRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Transaction not found"));
-//        // TODO: check quyền sở hữu
-//        transactionRepository.delete(existing);
-//    }
