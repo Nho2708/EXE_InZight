@@ -2,6 +2,7 @@ package org.inzight.service.SocialService;
 
 import lombok.RequiredArgsConstructor;
 import org.inzight.dto.request.ChatMessageRequest;
+import org.inzight.dto.response.ChatMessageResponse;
 import org.inzight.entity.ChatMessage;
 import org.inzight.entity.User;
 import org.inzight.repository.ChatMessageRepository;
@@ -12,6 +13,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +45,25 @@ public class ChatMessageService {
 
         // Gửi realtime qua WebSocket cho receiver
         messagingTemplate.convertAndSend("/topic/chat/" + request.getReceiverId(), message);
+    }
+
+    public List<ChatMessageResponse> getHistory(Long receiverId) {
+        Long currentUserId = authUtil.getCurrentUserId();
+
+        List<ChatMessage> messages = chatMessageRepository.findChatBetween(currentUserId, receiverId);
+
+        return messages.stream()
+                .map(m -> ChatMessageResponse.builder()
+                        .id(m.getId())
+                        .senderId(m.getSender().getId())
+                        .senderName(m.getSender().getFullName())
+                        .receiverId(m.getReceiver().getId())
+                        .receiverName(m.getReceiver().getFullName())
+                        .content(m.getContent())
+                        .createdAt(
+                                LocalDateTime.ofInstant(m.getCreatedAt(), ZoneId.of("Asia/Ho_Chi_Minh"))
+                        )
+                        .build())
+                .toList();
     }
 }
