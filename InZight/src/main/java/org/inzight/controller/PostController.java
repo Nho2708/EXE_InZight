@@ -9,6 +9,8 @@ import org.inzight.entity.Transaction;
 import org.inzight.service.SocialService.PostService;
 import org.inzight.service.TransactionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,8 +41,8 @@ public class PostController {
     }
     // get all post
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getAll() {
-        return ResponseEntity.ok(postService.getAll());
+    public ResponseEntity<List<PostResponse>> getAll(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(postService.getAll(userDetails));
     }
     // get user's post
     @GetMapping("/me")

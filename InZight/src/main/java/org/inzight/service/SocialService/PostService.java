@@ -8,9 +8,13 @@ import org.inzight.dto.request.PostRequest;
 import org.inzight.dto.response.PostResponse;
 import org.inzight.entity.*;
 import org.inzight.enums.TransactionType;
+import org.inzight.exception.AppException;
+import org.inzight.exception.ErrorCode;
+import org.inzight.repository.LikeRepository;
 import org.inzight.repository.PostRepository;
 import org.inzight.repository.UserRepository;
 import org.inzight.security.AuthUtil;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.inzight.mapper.PostMapper;
 
@@ -24,16 +28,25 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
     private final PostMapper postMapper;
 
     private final AuthUtil authUtil;
 
-    public List<PostResponse> getAll() {
-        List<Post> posts = postRepository.findAll();
+    public List<PostResponse> getAll(UserDetails userDetails) {
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        return posts.stream()
-                .map(postMapper::toResponse)
+        return postRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(post -> mapPostResponse(post, currentUser))
                 .toList();
+    }
+    private PostResponse mapPostResponse(Post post, User currentUser) {
+        PostResponse response = postMapper.toResponse(post);
+        response.setLiked(likeRepository.existsByPostAndUser(post, currentUser));
+        response.setLikeCount((int) likeRepository.countByPostId(post.getId()).intValue());
+        return response;
     }
 
     @Transactional

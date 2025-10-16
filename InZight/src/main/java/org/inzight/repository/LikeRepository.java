@@ -2,6 +2,8 @@ package org.inzight.repository;
 
 
 import org.inzight.entity.Like;
+import org.inzight.entity.Post;
+import org.inzight.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +17,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     Long countByPostId(Long postId);
     List<Like> findByPostId(Long postId);
+
+    boolean existsByPostAndUser(Post post, User user);
+
 }
