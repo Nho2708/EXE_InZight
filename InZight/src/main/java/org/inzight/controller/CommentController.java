@@ -27,6 +27,13 @@ public class CommentController {
     public ResponseEntity<List<CommentResponse>> getAll() {
         return ResponseEntity.ok(commentService.getAll());
     }
+
+    // get all cmt by post
+    @GetMapping("/post")
+    public ResponseEntity<List<CommentResponse>> getByPostId(@RequestParam("postId") Long postId) {
+        return ResponseEntity.ok(commentService.getCommentsByPostId(postId));
+    }
+
     // add cmt
     @PostMapping
     public ResponseEntity<CommentResponse> addComment(@RequestBody CommentRequest request) {
@@ -55,4 +62,6 @@ public class CommentController {
         commentService.deleteComment(id);
         return ResponseEntity.noContent().build();
     }
+
+
 }

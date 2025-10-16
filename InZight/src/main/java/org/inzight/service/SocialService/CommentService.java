@@ -39,6 +39,14 @@ public class CommentService {
                 .map(commentMapper::toResponse)
                 .toList();
     }
+
+    public List<CommentResponse> getCommentsByPostId(Long postId) {
+        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtDesc(postId);
+        return comments.stream()
+                .map(commentMapper::toResponse)
+                .toList();
+    }
+
     @Transactional
     public CommentResponse addComment(CommentRequest request) {
         try {
