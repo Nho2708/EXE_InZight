@@ -27,4 +27,8 @@ public class Category {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private CategoryType type; // INCOME | EXPENSE
+
+    // Thêm cột iconUrl
+    @Column(name = "icon_url", length = 255)
+    private String iconUrl;
 }

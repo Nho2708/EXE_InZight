@@ -32,3 +32,5 @@ springdoc:
         enabled: true
         path: /swagger-ui.html
         tags-sorter: alpha
+app:
+    icon-base-url: /icons/

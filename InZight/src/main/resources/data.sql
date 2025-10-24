@@ -67,3 +67,19 @@ INSERT INTO chat_messages (sender_id, receiver_id, content) VALUES
                                                                 (1, 2, 'Hello Bob, hôm nay thế nào?'),
                                                                 (2, 1, 'Hi Alice, mình ổn. Còn bạn?'),
                                                                 (3, 1, 'Alice ơi, giúp mình vụ Spring Boot với!');
+
+INSERT INTO categories (name, type, icon_url) VALUES
+                                                  ('Food', 'EXPENSE', 'https://cdn.inzightapp.com/icons/ic_food.png'),
+                                                  ('Groceries', 'EXPENSE', 'https://cdn.inzightapp.com/icons/ic_groceries.png'),
+                                                  ('Shopping', 'EXPENSE', 'https://cdn.inzightapp.com/icons/ic_shopping.png'),
+                                                  ('Entertainment', 'EXPENSE', 'https://cdn.inzightapp.com/icons/ic_entertainment.png'),
+                                                  ('Transfer', 'EXPENSE', 'https://cdn.inzightapp.com/icons/ic_transfer.png'),
+                                                  ('Salary', 'INCOME', 'https://cdn.inzightapp.com/icons/ic_salary.png'),
+                                                  ('Bonus', 'INCOME', 'https://cdn.inzightapp.com/icons/ic_bonus.png');
+ALTER TABLE categories
+    ADD COLUMN icon_url VARCHAR(255);
+
+Update transactions SET category_id = 13
+WHERE category_id = 6;
+
+DELETE FROM categories WHERE id = 6;
