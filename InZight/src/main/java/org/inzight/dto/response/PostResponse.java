@@ -4,6 +4,7 @@ package org.inzight.dto.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,6 +21,6 @@ public class PostResponse {
     private int shareCount;
     private boolean liked;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 }
