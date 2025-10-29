@@ -19,6 +19,7 @@ import org.inzight.security.AuthUtil;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -95,6 +96,15 @@ public class TransactionService {
             transaction.setAmount(request.getAmount());
             transaction.setType(TransactionType.valueOf(request.getType()));
             transaction.setNote(request.getNote());
+            // --- Cập nhật ngày giao dịch nếu FE gửi lên ---
+            if (request.getTransactionDate() != null && !request.getTransactionDate().equals(null)) {
+                try {
+                    Instant newDate = Instant.parse(request.getTransactionDate().toString());
+                    transaction.setTransactionDate(newDate);
+                } catch (Exception e) {
+                    log.warn("Invalid transactionDate format: {}", request.getTransactionDate());
+                }
+            }
 
             // apply new balance
             if (transaction.getType() == TransactionType.INCOME) {

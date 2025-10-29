@@ -13,7 +13,7 @@ public class NgrokRunner {
         try {
             File ngrokFile = new File(NGROK_PATH);
             if (!ngrokFile.exists()) {
-                System.err.println("⚠Không tìm thấy file ngrok tại: " + NGROK_PATH);
+                System.err.println("Không tìm thấy file ngrok tại: " + NGROK_PATH);
                 return;
             }
 

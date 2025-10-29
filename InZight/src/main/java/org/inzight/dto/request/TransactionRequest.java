@@ -4,6 +4,7 @@ package org.inzight.dto.request;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Data
 @Getter
@@ -17,4 +18,5 @@ public class TransactionRequest {
     private BigDecimal amount;
     private String type;   // "INCOME" | "EXPENSE"
     private String note;
+    private Instant transactionDate;
 }
