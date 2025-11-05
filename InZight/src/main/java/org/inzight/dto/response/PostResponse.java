@@ -15,6 +15,7 @@ public class PostResponse {
     private String imageUrl;
     private Long userId;
     private String username;
+    private String fullName;
     private List<CommentResponse> comments;
     private int likeCount;
     private int shareCount;

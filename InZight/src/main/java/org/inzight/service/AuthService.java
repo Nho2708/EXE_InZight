@@ -38,18 +38,27 @@ public class AuthService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String token = jwtUtil.generateToken(userDetails);
 
-        return new AuthResponse(token, user.getUsername(), user.getEmail(), user.getAvatarUrl());
+        return new AuthResponse(token, user.getUsername(), user.getEmail(), user.getAvatarUrl(), user.getFullName());
     }
 
     public AuthResponse login(LoginRequest request) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.username());
+        User user = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!passwordEncoder.matches(request.password(), userDetails.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        String token = jwtUtil.generateToken(userDetails);
-        User user = userRepository.findByUsername(request.username()).orElseThrow();
-        return new AuthResponse(token, user.getUsername(), user.getEmail(), user.getAvatarUrl());
+        String token = jwtUtil.generateToken(
+                userDetailsService.loadUserByUsername(user.getUsername())
+        );
+
+        return new AuthResponse(
+                token,
+                user.getUsername(),
+                user.getEmail(),
+                user.getAvatarUrl(),
+                user.getFullName()
+        );
     }
 }

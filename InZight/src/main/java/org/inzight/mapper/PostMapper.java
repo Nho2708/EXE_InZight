@@ -15,6 +15,7 @@ public interface PostMapper {
 
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "user.username", target = "username")
+    @Mapping(source = "user.fullName", target = "fullName")
     @Mapping(source = "comments", target = "comments")
     PostResponse toResponse(Post post);
 

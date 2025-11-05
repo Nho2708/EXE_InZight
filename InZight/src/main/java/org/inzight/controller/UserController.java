@@ -1,9 +1,7 @@
 package org.inzight.controller;
 
-
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.inzight.dto.request.UserRegisterRequest;
 import org.inzight.dto.response.UserResponse;
 import org.inzight.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +15,15 @@ public class UserController {
 
     private final UserService userService;
 
-
-
+    //  Lấy user theo id (cho mục đích khác, vd: xem profile người khác)
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    //  Lấy user hiện tại (cho Android gọi sau khi login)
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser() {
+        return ResponseEntity.ok(userService.getCurrentUser());
     }
 }
