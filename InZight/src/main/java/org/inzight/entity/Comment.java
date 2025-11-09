@@ -1,10 +1,10 @@
 package org.inzight.entity;
 
-
-
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,25 +19,37 @@ import lombok.*;
         })
 public class Comment extends BaseEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    // Quan hệ với Post (nhiều comment thuộc 1 post)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
-
     private Post post;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    // Quan hệ với User (nhiều comment thuộc 1 user)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
+    // Nội dung comment
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    // Khi xoá comment, xoá luôn các like
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentLike> likes = new ArrayList<>();
+
+    // Giúp quản lý 2 chiều (khi thêm like)
+    public void addLike(CommentLike like) {
+        likes.add(like);
+        like.setComment(this);
+    }
+
+    public void removeLike(CommentLike like) {
+        likes.remove(like);
+        like.setComment(null);
+    }
 }
