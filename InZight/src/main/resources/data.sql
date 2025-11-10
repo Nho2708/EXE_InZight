@@ -76,10 +76,37 @@ INSERT INTO categories (name, type, icon_url) VALUES
                                                   ('Transfer', 'EXPENSE', 'https://cdn.inzightapp.com/icons/ic_transfer.png'),
                                                   ('Salary', 'INCOME', 'https://cdn.inzightapp.com/icons/ic_salary.png'),
                                                   ('Bonus', 'INCOME', 'https://cdn.inzightapp.com/icons/ic_bonus.png');
-ALTER TABLE categories
-    ADD COLUMN icon_url VARCHAR(255);
-
-Update transactions SET category_id = 13
-WHERE category_id = 6;
-
-DELETE FROM categories WHERE id = 6;
+# ALTER TABLE categories
+#     ADD COLUMN icon_url VARCHAR(255);
+#
+# Update transactions SET category_id = 13
+# WHERE category_id = 6;
+#
+# DELETE FROM categories WHERE id = 6;
+#
+# USE InZightApp;
+#
+# ALTER TABLE comment_likes
+#     DROP FOREIGN KEY FK3wa5u7bs1p1o9hmavtgdgk1go,
+#     ADD CONSTRAINT FK3wa5u7bs1p1o9hmavtgdgk1go
+#         FOREIGN KEY (comment_id)
+#             REFERENCES comments(id)
+#             ON DELETE CASCADE;
+#
+# SHOW CREATE TABLE comment_likes;
+# ALTER TABLE comment_likes
+#     DROP FOREIGN KEY FK3wa5u7bs1p1o9hmavtgdgk1go;
+# ALTER TABLE comment_likes
+#     ADD CONSTRAINT FK3wa5u7bs1p1o9hmavtgdgk1go
+#         FOREIGN KEY (comment_id)
+#             REFERENCES comments(id)
+#             ON DELETE CASCADE;
+#
+# ALTER TABLE comment_likes
+#     DROP FOREIGN KEY FK6h3lbneryl5pyb9ykaju7werx;
+#
+# ALTER TABLE comment_likes
+#     ADD CONSTRAINT FK6h3lbneryl5pyb9ykaju7werx
+#         FOREIGN KEY (user_id)
+#             REFERENCES users(id)
+#             ON DELETE CASCADE;
