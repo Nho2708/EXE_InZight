@@ -1,3 +1,11 @@
 package org.inzight.dto.request;
 
-public record RegisterRequest(String username, String email, String password, String fullName) {}
+// Đảm bảo Record này là public
+public record RegisterRequest(
+        String username,
+        String email,
+        String fullName,
+        String dateOfBirth,
+        String gender,
+        String password
+) {}

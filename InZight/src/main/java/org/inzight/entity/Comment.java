@@ -35,7 +35,7 @@ public class Comment extends BaseEntity {
 
     // Nội dung comment
     @Lob
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String content;
 
     // Khi xoá comment, xoá luôn các like

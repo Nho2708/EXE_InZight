@@ -2,6 +2,8 @@ package org.inzight.dto.response;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class UserResponse {
     private Long id;
@@ -9,4 +11,7 @@ public class UserResponse {
     private String email;
     private String fullName;
     private String avatarUrl;
+    private String phone;
+    private LocalDate dateOfBirth;
+    private String gender;
 }

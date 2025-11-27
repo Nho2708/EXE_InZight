@@ -14,14 +14,37 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
 
+        User user = null;
+
+        // Nếu có '@' -> cố gắng tìm bằng email
+        if (login.contains("@")) {
+            user = userRepository.findByEmail(login)
+                    .orElse(null);
+        }
+
+        // Nếu chưa tìm được -> tìm bằng username
+        if (user == null) {
+            user = userRepository.findByUsername(login)
+                    .orElse(null);
+        }
+
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found: " + login);
+        }
+
+        // Trả về UserDetails. GHI CHÚ: setUsername là user.getUsername() để nhất quán
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
+                .withUsername(user.getUsername())   // dùng username cố định
                 .password(user.getPassword())
-                .authorities("USER") // có thể mở rộng roles
+                .authorities("USER")
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(false)
                 .build();
     }
+
 }

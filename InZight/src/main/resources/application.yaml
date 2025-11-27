@@ -1,10 +1,12 @@
+# FILE: src/main/resources/application.yml (hoặc .yaml)
+
 spring:
+    # Cấu hình Database (Giữ nguyên)
     datasource:
         url: jdbc:mysql://localhost:3307/InZightApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
         username: root
         password: 12345
         driver-class-name: com.mysql.cj.jdbc.Driver
-
     jpa:
         hibernate:
             ddl-auto: update
@@ -20,10 +22,29 @@ spring:
             schema-locations: classpath:schema.sql
             data-locations: classpath:data.sql
 
+    # >>> CẤU HÌNH MAIL ĐÃ KHẮC PHỤC (Nằm dưới 'spring') <<<
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: nhontqse151350@fpt.edu.vn # Email hệ thống (Người gửi)
+        password: odcx jvrw bkxp cstu        # Mật khẩu Ứng dụng (App Password)
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
+                        required: true
+                    connectiontimeout: 5000
+                    timeout: 5000
+                    writetimeout: 5000
 
+# Cấu hình Server (Giữ nguyên)
 server:
     port: 8080
     forward-headers-strategy: framework
+
+# Cấu hình SpringDoc/Swagger (Giữ nguyên)
 springdoc:
     api-docs:
         enabled: true
@@ -32,5 +53,11 @@ springdoc:
         enabled: true
         path: /swagger-ui.html
         tags-sorter: alpha
+
+# Cấu hình app riêng
 app:
     icon-base-url: /icons/
+    mail:
+        sender: nhontqse151350@fpt.edu.vn # Email hiển thị trong trường FROM
+
+
