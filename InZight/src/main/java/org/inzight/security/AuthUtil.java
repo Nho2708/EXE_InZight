@@ -29,4 +29,6 @@ public class AuthUtil {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+
 }

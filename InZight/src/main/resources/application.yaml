@@ -19,6 +19,17 @@ spring:
             mode: never
             schema-locations: classpath:schema.sql
             data-locations: classpath:data.sql
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: 01647761525thaiduy@gmail.com
+        password: gned xubx qatk oejs
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
 
 
 server:
