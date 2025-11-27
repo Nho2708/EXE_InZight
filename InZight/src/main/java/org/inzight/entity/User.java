@@ -2,6 +2,7 @@ package org.inzight.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.inzight.enums.RoleName;
 
 
 import java.time.LocalDate;
@@ -53,6 +54,10 @@ public class User extends BaseEntity {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private RoleName role; // USER hoặc ADMIN
+
     @Column(name = "gender", length = 20)
     private String gender;
 
@@ -63,5 +68,6 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
+
 
 }

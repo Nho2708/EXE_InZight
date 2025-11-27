@@ -1,5 +1,7 @@
 package org.inzight.dto.request;
 
+import org.inzight.enums.RoleName;
+
 // Đảm bảo Record này là public
 public record RegisterRequest(
         String username,
@@ -7,5 +9,8 @@ public record RegisterRequest(
         String fullName,
         String dateOfBirth,
         String gender,
-        String password
-) {}
+        String password,
+        RoleName role
+) {
+
+}

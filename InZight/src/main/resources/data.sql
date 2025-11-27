@@ -76,6 +76,9 @@ INSERT INTO categories (name, type, icon_url) VALUES
                                                   ('Transfer', 'EXPENSE', 'https://cdn.inzightapp.com/icons/ic_transfer.png'),
                                                   ('Salary', 'INCOME', 'https://cdn.inzightapp.com/icons/ic_salary.png'),
                                                   ('Bonus', 'INCOME', 'https://cdn.inzightapp.com/icons/ic_bonus.png');
+
+ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'USER';
+
 # ALTER TABLE categories
 #     ADD COLUMN icon_url VARCHAR(255);
 #

@@ -7,7 +7,9 @@ import org.inzight.dto.request.RegisterRequest;
 import org.inzight.dto.request.VerifyOtpRequest;
 import org.inzight.dto.response.AuthResponse;
 import org.inzight.dto.response.InitRegisterResponse;
+import org.inzight.dto.response.RegisterResponse;
 import org.inzight.entity.User;
+import org.inzight.enums.RoleName;
 import org.inzight.repository.UserRepository;
 import org.inzight.security.JwtUtil;
 import org.inzight.service.CustomUserDetailsService;
@@ -43,7 +45,6 @@ public class AuthController {
     private final SmsService smsService;
     private final CustomUserDetailsService userDetailsService;
 
-
     // ******************************************************
     // CƠ CHẾ LƯU TRỮ TẠM THỜI VÀ MÃ OTP
     private final Map<String, RegisterRequest> tempRegistrationData = new ConcurrentHashMap<>();
@@ -53,7 +54,8 @@ public class AuthController {
         return String.format("%06d", new java.util.Random().nextInt(999999));
     }
 
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     private boolean isValidEmail(String contact) {
         if (contact == null || contact.trim().isEmpty()) return false;
@@ -61,16 +63,18 @@ public class AuthController {
     }
 
     private boolean isValidPhone(String contact) {
-        // Giả định phone chỉ chứa số và có độ dài hợp lệ (từ 8 chữ số trở lên)
-        if (contact == null || contact.trim().isEmpty()) return false;
-        return contact.matches("[0-9]+") && contact.length() >= 8;
+        return contact != null && contact.matches("[0-9]+") && contact.length() >= 8;
     }
     // ******************************************************
 
 
-    // ENDPOINT 1: Khởi tạo đăng ký và gửi OTP (HỖ TRỢ CẢ EMAIL VÀ PHONE)
+
+    // ============================
+    // 1) INIT REGISTER + SEND OTP
+    // ============================
     @PostMapping("/init-register")
     public ResponseEntity<?> initRegister(@Valid @RequestBody RegisterRequest request) {
+
         if (userRepository.findByUsername(request.username()).isPresent()) {
             return ResponseEntity.badRequest().body("Username đã tồn tại!");
         }
@@ -80,53 +84,48 @@ public class AuthController {
             }
         }
 
-        // Chỉ cho phép email hợp lệ
         if (!isValidEmail(request.email())) {
             return ResponseEntity.badRequest().body("Vui lòng cung cấp Email hợp lệ để gửi mã OTP.");
         }
 
-        // 1. Tạo Token và OTP
         String token = UUID.randomUUID().toString();
         String otpCode = generateOtp();
 
-        // 2. Lưu trữ tạm thời
         tempRegistrationData.put(token, request);
         otpStorage.put(token, otpCode);
 
-        // 3. Gửi OTP qua email
         emailService.sendOtpEmail(request.email(), otpCode);
 
-        // 4. Trả về Token
         return ResponseEntity.ok(new InitRegisterResponse(token));
     }
 
 
 
+    // ============================
+    // 2) VERIFY OTP + CREATE USER
+    // ============================
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
+
         String token = request.registrationToken();
         String otpSent = request.otp();
 
         if (!tempRegistrationData.containsKey(token) || !otpStorage.containsKey(token)) {
-            return ResponseEntity.status(400).body("Token đăng ký không hợp lệ hoặc đã hết hạn.");
+            return ResponseEntity.badRequest().body("Token đăng ký không hợp lệ hoặc đã hết hạn.");
         }
 
-        String storedOtp = otpStorage.get(token);
-        if (!storedOtp.equals(otpSent)) {
-            return ResponseEntity.status(400).body("Mã OTP không chính xác.");
+        if (!otpStorage.get(token).equals(otpSent)) {
+            return ResponseEntity.badRequest().body("Mã OTP không chính xác.");
         }
 
-        // Nếu thành công: Lấy dữ liệu tạm thời và tạo User chính thức
         RegisterRequest registerRequest = tempRegistrationData.get(token);
 
         LocalDate dob = null;
-        if (registerRequest.dateOfBirth() != null && !registerRequest.dateOfBirth().isEmpty()) {
-            try {
+        try {
+            if (registerRequest.dateOfBirth() != null && !registerRequest.dateOfBirth().isEmpty()) {
                 dob = LocalDate.parse(registerRequest.dateOfBirth(), DateTimeFormatter.ISO_LOCAL_DATE);
-            } catch (Exception e) {
-                // ignore
             }
-        }
+        } catch (Exception ignored) {}
 
         User user = User.builder()
                 .username(registerRequest.username())
@@ -135,46 +134,60 @@ public class AuthController {
                 .password(passwordEncoder.encode(registerRequest.password()))
                 .dateOfBirth(dob)
                 .gender(registerRequest.gender())
+                .role(RoleName.valueOf("USER"))
                 .build();
 
         userRepository.save(user);
 
-        // Dọn dẹp dữ liệu tạm thời
         tempRegistrationData.remove(token);
         otpStorage.remove(token);
 
-        // 🔹 Sinh JWT và trả về AuthResponse
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-        String jwtToken = jwtUtil.generateToken(userDetails);
+        // 🔥 SỬ DỤNG generateToken(User user)
+        String jwtToken = jwtUtil.generateToken(user);
 
-        AuthResponse authResponse = new AuthResponse(
+        RegisterResponse authResponse = new RegisterResponse(
                 jwtToken,
                 user.getUsername(),
                 user.getEmail(),
                 user.getAvatarUrl(),
-                user.getFullName()
+                user.getFullName(),
+                user.getRole()
         );
 
         return ResponseEntity.ok(authResponse);
     }
 
 
-    // Đăng nhập lấy JWT (Giữ nguyên)
+
+    // ============================
+    // 3) LOGIN
+    // ============================
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.contact(), request.password())
+                    new UsernamePasswordAuthenticationToken(
+                            request.contact(), request.password()
+                    )
             );
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String token = jwtUtil.generateToken(userDetails);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
-            response.put("username", userDetails.getUsername());
+            // Lấy user từ DB
+            User user = userRepository.findByUsername(userDetails.getUsername())
+                    .or(() -> userRepository.findByEmail(userDetails.getUsername()))
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-            return ResponseEntity.ok(response);
+            // 🔥 DÙNG generateToken(User user) — KHÔNG dùng UserDetails
+            String token = jwtUtil.generateToken(user);
+
+            AuthResponse authResponse = new AuthResponse(
+                    token,
+                    user.getUsername(),
+                    user.getRole()
+            );
+
+            return ResponseEntity.ok(authResponse);
 
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Sai username hoặc password!");

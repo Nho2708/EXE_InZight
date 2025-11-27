@@ -4,12 +4,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.inzight.service.SocialService.CommentLikeService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/comment-likes")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class CommentLikeController {
 
     private final CommentLikeService commentLikeService;
