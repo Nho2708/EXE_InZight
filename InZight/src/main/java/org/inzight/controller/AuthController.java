@@ -14,7 +14,6 @@ import org.inzight.repository.UserRepository;
 import org.inzight.security.JwtUtil;
 import org.inzight.service.CustomUserDetailsService;
 import org.inzight.service.EmailService;
-import org.inzight.service.SmsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,7 +41,6 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
-    private final SmsService smsService;
     private final CustomUserDetailsService userDetailsService;
 
     // ******************************************************
