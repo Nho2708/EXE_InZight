@@ -9,7 +9,6 @@ import org.inzight.entity.User;
 import org.inzight.repository.UserRepository;
 import org.inzight.security.AuthUtil;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.mail.MailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final EmailService emailService;
+    private final EmailSettingService emailsettingService;
 
 
 
@@ -80,7 +79,7 @@ public class UserService {
         String key = "otp:" + currentUser.getEmail();
         redisTemplate.opsForValue().set(key, otp, OTP_TTL_SECONDS, TimeUnit.SECONDS);
 
-        emailService.send(
+        emailsettingService.send(
                 currentUser.getEmail(),
                 "Your OTP Code to Change Password",
                 "Your verification code is: " + otp + "\nIt expires in 5 minutes."
@@ -143,8 +142,8 @@ public class UserService {
         String key = "otp:change-email:" + currentUser.getId();
         redisTemplate.opsForValue().set(key, otp, OTP_TTL_SECONDS, TimeUnit.SECONDS);
 
-        // 5️⃣ Gửi OTP về EMAIL CŨ (oldEmail)
-        emailService.send(
+
+        emailsettingService.send(
                 oldEmail,
                 "OTP confirmation email change",
                 "The OTP code to change your email is: " + otp + "\n" + "Code expires after 5 minutes."
