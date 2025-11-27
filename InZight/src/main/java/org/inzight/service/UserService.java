@@ -62,6 +62,9 @@ public class UserService {
         res.setEmail(user.getEmail());
         res.setFullName(user.getFullName());
         res.setAvatarUrl(user.getAvatarUrl());
+        res.setPhone(user.getPhone());
+        res.setDateOfBirth(user.getDateOfBirth());
+        res.setGender(user.getGender());
         return res;
     }
 

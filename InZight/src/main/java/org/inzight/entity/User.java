@@ -2,8 +2,10 @@ package org.inzight.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.inzight.enums.RoleName;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,9 +45,21 @@ public class User extends BaseEntity {
     private String fullName;
 
 
-    @Column(name = "avatar_url", length = 255)
+    @Column(name = "avatar_url",columnDefinition = "LONGTEXT")
     private String avatarUrl;
 
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private RoleName role; // USER hoặc ADMIN
+
+    @Column(name = "gender", length = 20)
+    private String gender;
 
     // Relations (optional mapped lists for convenience)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -54,4 +68,6 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
+
+
 }

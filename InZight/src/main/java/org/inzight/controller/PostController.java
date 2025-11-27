@@ -9,6 +9,7 @@ import org.inzight.entity.Transaction;
 import org.inzight.service.SocialService.PostService;
 import org.inzight.service.TransactionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequestMapping("/posts")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class PostController {
 
     private final PostService postService;

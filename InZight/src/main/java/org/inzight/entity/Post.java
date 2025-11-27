@@ -30,11 +30,11 @@ public class Post extends BaseEntity {
 
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String content;
 
 
-    @Column(name = "image_url", length = 255)
+    @Column(name = "image_url", columnDefinition = "LONGTEXT")
     private String imageUrl;
 
 

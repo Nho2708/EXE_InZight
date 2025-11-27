@@ -9,6 +9,7 @@ import org.inzight.dto.response.CommentResponse;
 import org.inzight.dto.response.PostResponse;
 import org.inzight.service.SocialService.CommentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 @RequestMapping("/comments")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
-
+@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class CommentController {
 
     private final CommentService commentService;
