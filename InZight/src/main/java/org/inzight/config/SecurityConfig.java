@@ -44,7 +44,9 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/ws/**",
-                                "/ws/info/**"
+                                "/ws/info/**",
+                                "/api/pay/webhook",
+                                "/api/pay/create"
                         ).permitAll()
 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")   // 👈 THÊM DÒNG NÀY

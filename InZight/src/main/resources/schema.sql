@@ -160,3 +160,9 @@ CREATE TABLE IF NOT EXISTS chat_messages (
                                              FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
                                              FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+ALTER TABLE users
+    ADD COLUMN `rank` VARCHAR(50) DEFAULT 'FREE';
+
+ALTER TABLE users
+    ADD COLUMN rank_expired_at DATETIME NULL;
