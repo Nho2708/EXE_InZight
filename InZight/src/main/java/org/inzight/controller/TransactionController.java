@@ -42,7 +42,7 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("@security.hasPermissionToModifyTransaction(#id)")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TransactionResponse> updateTransaction(
             @PathVariable Long id,
             @RequestBody TransactionRequest request) {
@@ -50,7 +50,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("@security.hasPermissionToModifyTransaction(#id)")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
         transactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();

@@ -1,6 +1,7 @@
 package org.inzight.dto.response;
 
 import lombok.Data;
+import org.inzight.enums.RoleName;
 
 import java.time.LocalDate;
 
@@ -14,4 +15,5 @@ public class UserResponse {
     private String phone;
     private LocalDate dateOfBirth;
     private String gender;
+    private RoleName role;
 }

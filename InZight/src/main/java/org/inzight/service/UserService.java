@@ -1,21 +1,20 @@
 package org.inzight.service;
 
 import lombok.RequiredArgsConstructor;
-import org.inzight.dto.request.ChangeEmailRequest;
-import org.inzight.dto.request.ChangePasswordRequest;
-import org.inzight.dto.request.ConfirmEmailChangeRequest;
+import org.inzight.dto.request.*;
 import org.inzight.dto.response.UserResponse;
 import org.inzight.entity.User;
+import org.inzight.enums.RoleName;
 import org.inzight.repository.UserRepository;
 import org.inzight.security.AuthUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Random;
-
-import org.inzight.dto.request.ConfirmChangePasswordRequest;
 
 import java.util.concurrent.TimeUnit;
 
@@ -65,6 +64,7 @@ public class UserService {
         res.setPhone(user.getPhone());
         res.setDateOfBirth(user.getDateOfBirth());
         res.setGender(user.getGender());
+        res.setRole(user.getRole());
         return res;
     }
 
@@ -200,7 +200,72 @@ public class UserService {
         return "Email changed successfully";
     }
 
+    // --- ADMIN SECTION ---
 
+    // 1. Get All Users (Có phân trang)
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(this::mapToResponse);
+    }
+
+    // 2. Create User (By Admin)
+    public UserResponse createUserByAdmin(AdminCreateUserRequest req) {
+        if (userRepository.existsByUsername(req.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
+        if (userRepository.existsByEmail(req.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = User.builder()
+                .username(req.getUsername())
+                .email(req.getEmail())
+                .password(passwordEncoder.encode(req.getPassword()))
+                .fullName(req.getFullName())
+                .phone(req.getPhone())
+                .role(req.getRole() != null ? req.getRole() : RoleName.USER) // Default USER nếu null
+                .gender(req.getGender())
+                .dateOfBirth(req.getDateOfBirth())
+                .build();
+
+        User savedUser = userRepository.save(user);
+        return mapToResponse(savedUser);
+    }
+
+    // 3. Update User (By Admin)
+    public UserResponse updateUserByAdmin(Long id, AdminUpdateUserRequest req) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Cập nhật các trường thông tin
+        if (req.getFullName() != null) user.setFullName(req.getFullName());
+        if (req.getPhone() != null) user.setPhone(req.getPhone());
+        if (req.getGender() != null) user.setGender(req.getGender());
+        if (req.getDateOfBirth() != null) user.setDateOfBirth(req.getDateOfBirth());
+
+        // Cập nhật Role nếu có
+        if (req.getRole() != null) {
+            // Có thể thêm check không cho phép Admin tự hạ quyền chính mình nếu cần
+            user.setRole(req.getRole());
+        }
+
+        User updatedUser = userRepository.save(user);
+        return mapToResponse(updatedUser);
+    }
+
+    // 4. Delete User
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Prevent deleting yourself (optional safety check)
+        Long currentUserId = authUtil.getCurrentUserId();
+        if (user.getId().equals(currentUserId)) {
+            throw new RuntimeException("You cannot delete your own account.");
+        }
+
+        userRepository.delete(user);
+    }
 
 
 }
