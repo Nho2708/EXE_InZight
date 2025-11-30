@@ -38,6 +38,10 @@ spring:
                     connectiontimeout: 5000
                     timeout: 5000
                     writetimeout: 5000
+    payos:
+        client-id: "ab0c2f76-05c3-46cc-a5cd-44cb7927d0fe"
+        api-key: "049ce78b-40aa-452d-83a8-f5e8bd9d2ea3"
+        checksum-key: "ee84ecf1be64d1cb29945a8cb2140d5dc0a11ded055f8d3087d88aa66ee97184"
 
 # Cấu hình Server (Giữ nguyên)
 server:

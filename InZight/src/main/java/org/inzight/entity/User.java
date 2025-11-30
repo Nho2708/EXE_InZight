@@ -6,6 +6,7 @@ import org.inzight.enums.RoleName;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +62,12 @@ public class User extends BaseEntity {
     @Column(name = "gender", length = 20)
     private String gender;
 
+    @Column(name = "`rank`", length = 50)
+    private String rank = "FREE";
+
+    @Column(name = "rank_expired_at")
+    private LocalDateTime rankExpiredAt;
+
     // Relations (optional mapped lists for convenience)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Wallet> wallets = new ArrayList<>();
@@ -68,5 +75,8 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
+
+
+
 
 }
