@@ -7,7 +7,7 @@ COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
 # Copy toàn bộ source code vào
-COPY src ./InZight/src
+COPY src ./src
 
 # Build ra file .jar (bỏ qua test để build nhanh hơn trên cloud)
 RUN mvn clean package -DskipTests
