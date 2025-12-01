@@ -7,6 +7,7 @@ public record RegisterResponse(
         String email,
         String avatarUrl,
         String fullName,
-        RoleName role   // 👉 THÊM ROLE
+        RoleName role,   // 👉 THÊM ROLE
+        String rank
 )
 { }

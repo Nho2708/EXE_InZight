@@ -40,6 +40,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.password()))
                 .avatarUrl(null)
                 .role(RoleName.valueOf("USER"))            // 👈 GÁN QUYỀN MẶC ĐỊNH
+                .rank("FREE")
                 .build();
 
         userRepository.save(user);
@@ -53,7 +54,8 @@ public class AuthService {
                 user.getEmail(),
                 user.getAvatarUrl(),
                 user.getFullName(),
-                user.getRole()
+                user.getRole(),
+                user.getRank()
         );
     }
 
@@ -74,7 +76,8 @@ public class AuthService {
         return new AuthResponse(
                 token,
                 user.getUsername(),
-                user.getRole()
+                user.getRole(),
+                user.getRank()
         );
     }
 }

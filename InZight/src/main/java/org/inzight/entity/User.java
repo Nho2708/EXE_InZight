@@ -62,6 +62,7 @@ public class User extends BaseEntity {
     @Column(name = "gender", length = 20)
     private String gender;
 
+    @Builder.Default
     @Column(name = "`rank`", length = 50)
     private String rank = "FREE";
 

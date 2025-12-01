@@ -149,7 +149,8 @@ public class AuthController {
                 user.getEmail(),
                 user.getAvatarUrl(),
                 user.getFullName(),
-                user.getRole()
+                user.getRole(),
+                user.getRank()
         );
 
         return ResponseEntity.ok(authResponse);
@@ -182,7 +183,8 @@ public class AuthController {
             AuthResponse authResponse = new AuthResponse(
                     token,
                     user.getUsername(),
-                    user.getRole()
+                    user.getRole(),
+                    user.getRank()
             );
 
             return ResponseEntity.ok(authResponse);
