@@ -3,9 +3,9 @@
 spring:
     # Cấu hình Database (Giữ nguyên)
     datasource:
-        url: jdbc:mysql://localhost:3307/InZightApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+        url: jdbc:mysql://yamanote.proxy.rlwy.net:15119/railway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
         username: root
-        password: 12345
+        password: ubHidNSGDsFSwDUwnDrFKyZCgoOILqNu
         driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
         hibernate:
@@ -42,6 +42,12 @@ spring:
         client-id: "ab0c2f76-05c3-46cc-a5cd-44cb7927d0fe"
         api-key: "049ce78b-40aa-452d-83a8-f5e8bd9d2ea3"
         checksum-key: "ee84ecf1be64d1cb29945a8cb2140d5dc0a11ded055f8d3087d88aa66ee97184"
+
+    data:
+        redis:
+            host: ${REDIS_HOST:localhost} # Mặc định là localhost nếu không có biến môi trường
+            port: ${REDIS_PORT:6379}
+            password: ${REDIS_PASSWORD:}  # Để trống nếu không có pass
 
 # Cấu hình Server (Giữ nguyên)
 server:
