@@ -50,7 +50,13 @@ public class UserService {
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return mapToResponse(user);
+        System.out.println("🔍 UserService.getCurrentUser - User ID: " + currentUserId);
+        System.out.println("🔍 UserService.getCurrentUser - User rank from DB: " + user.getRank());
+        
+        UserResponse response = mapToResponse(user);
+        System.out.println("🔍 UserService.getCurrentUser - Response rank: " + response.getRank());
+        
+        return response;
     }
 
     //  Helper để map entity → DTO
@@ -65,6 +71,14 @@ public class UserService {
         res.setDateOfBirth(user.getDateOfBirth());
         res.setGender(user.getGender());
         res.setRole(user.getRole());
+        
+        // Map rank từ User entity
+        String rank = user.getRank() != null ? user.getRank() : "FREE";
+        res.setRank(rank);
+        
+        // Log để debug
+        System.out.println("🔍 UserService.mapToResponse - User ID: " + user.getId() + ", Username: " + user.getUsername() + ", Rank: " + rank);
+        
         return res;
     }
 
