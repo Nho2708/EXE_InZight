@@ -26,8 +26,8 @@ spring:
     mail:
         host: smtp.gmail.com
         port: 587
-        username: nhontqse151350@fpt.edu.vn # Email hệ thống (Người gửi)
-        password: odcx jvrw bkxp cstu        # Mật khẩu Ứng dụng (App Password)
+        username: ${SPRING_MAIL_USERNAME}
+        password: ${SPRING_MAIL_PASSWORD}
         properties:
             mail:
                 smtp:
@@ -39,9 +39,9 @@ spring:
                     timeout: 5000
                     writetimeout: 5000
     payos:
-        client-id: "ab0c2f76-05c3-46cc-a5cd-44cb7927d0fe"
-        api-key: "049ce78b-40aa-452d-83a8-f5e8bd9d2ea3"
-        checksum-key: "ee84ecf1be64d1cb29945a8cb2140d5dc0a11ded055f8d3087d88aa66ee97184"
+        client-id: ${PAYOS_CLIENT_ID}
+        api-key: ${PAYOS_API_KEY}
+        checksum-key: ${PAYOS_CHECKSUM_KEY}
 
     data:
         redis:
@@ -68,6 +68,71 @@ springdoc:
 app:
     icon-base-url: /icons/
     mail:
-        sender: nhontqse151350@fpt.edu.vn # Email hiển thị trong trường FROM
+        sender: ${APP_MAIL_SENDER}
 
 
+# FILE: src/main/resources/application.yml (hoặc .yaml)
+
+#spring:
+#    # Cấu hình Database (Giữ nguyên)
+#    datasource:
+#        url: jdbc:mysql://localhost:3307/InZightApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+#        username: root
+#        password: 12345
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#    jpa:
+#        hibernate:
+#            ddl-auto: update
+#        show-sql: true
+#        properties:
+#            hibernate:
+#                format_sql: true
+#        defer-datasource-initialization: true
+#
+#    sql:
+#        init:
+#            mode: never
+#            schema-locations: classpath:schema.sql
+#            data-locations: classpath:data.sql
+#
+#    # >>> CẤU HÌNH MAIL ĐÃ KHẮC PHỤC (Nằm dưới 'spring') <<<
+#    mail:
+#        host: smtp.gmail.com
+#        port: 587
+#        username: ${SPRING_MAIL_USERNAME}
+#        password: ${SPRING_MAIL_PASSWORD}
+#        properties:
+#            mail:
+#                smtp:
+#                    auth: true
+#                    starttls:
+#                        enable: true
+#                        required: true
+#                    connectiontimeout: 5000
+#                    timeout: 5000
+#                    writetimeout: 5000
+#    payos:
+#        client-id: ${PAYOS_CLIENT_ID}
+#        api-key: ${PAYOS_API_KEY}
+#        checksum-key: ${PAYOS_CHECKSUM_KEY}
+#
+## Cấu hình Server (Giữ nguyên)
+#server:
+#    port: 8080
+#    forward-headers-strategy: framework
+#
+## Cấu hình SpringDoc/Swagger (Giữ nguyên)
+#springdoc:
+#    api-docs:
+#        enabled: true
+#        path: /v3/api-docs
+#    swagger-ui:
+#        enabled: true
+#        path: /swagger-ui.html
+#        tags-sorter: alpha
+#
+## Cấu hình app riêng
+#app:
+#    icon-base-url: /icons/
+#    mail:
+#        sender: ${APP_MAIL_SENDER}
