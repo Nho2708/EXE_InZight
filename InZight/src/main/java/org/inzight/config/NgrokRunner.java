@@ -5,7 +5,7 @@ import java.io.File;
 public class NgrokRunner {
 
     //Cấu hình domain & đường dẫn ngrok
-    private static final String NGROK_PATH = "C:\\Program Files\\ngrok-v3\\ngrok.exe";
+    private static final String NGROK_PATH = "C:\\ngrok\\ngrok.exe";
     private static final String NGROK_DOMAIN = "maynard-unphysical-planographically.ngrok-free.dev";
     private static final int LOCAL_PORT = 8080;
 

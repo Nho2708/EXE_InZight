@@ -46,6 +46,7 @@ public class SecurityConfig {
                                 "/ws/**",
                                 "/ws/info/**",
                                 "/api/pay/webhook",
+
                                 "/api/pay/create"
                         ).permitAll()
 
@@ -57,6 +58,7 @@ public class SecurityConfig {
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
