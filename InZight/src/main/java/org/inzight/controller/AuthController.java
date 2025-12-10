@@ -9,11 +9,15 @@ import org.inzight.dto.response.AuthResponse;
 import org.inzight.dto.response.InitRegisterResponse;
 import org.inzight.dto.response.RegisterResponse;
 import org.inzight.entity.User;
+import org.inzight.entity.Wallet;
 import org.inzight.enums.RoleName;
 import org.inzight.repository.UserRepository;
+import org.inzight.repository.WalletRepository;
 import org.inzight.security.JwtUtil;
 import org.inzight.service.CustomUserDetailsService;
 import org.inzight.service.EmailService;
+
+import java.math.BigDecimal;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,6 +41,7 @@ import java.util.regex.Pattern;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final WalletRepository walletRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
@@ -136,6 +141,15 @@ public class AuthController {
                 .build();
 
         userRepository.save(user);
+
+        // Tự động tạo wallet "Transfer" cho user mới
+        Wallet defaultWallet = Wallet.builder()
+                .user(user)
+                .name("Transfer")
+                .balance(BigDecimal.ZERO)
+                .currency("VND")
+                .build();
+        walletRepository.save(defaultWallet);
 
         tempRegistrationData.remove(token);
         otpStorage.remove(token);

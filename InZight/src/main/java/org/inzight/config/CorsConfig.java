@@ -13,7 +13,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://10.0.2.2:8080", "http://localhost:8080", "*")
+                        .allowedOriginPatterns("*") // Cho phép tất cả origins (bao gồm ngrok)
                         .allowedMethods("GET","POST","PUT","DELETE","PATCH","OPTIONS")
                         .allowedHeaders("*")
                         .exposedHeaders("Authorization")

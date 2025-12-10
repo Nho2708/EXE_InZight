@@ -4,9 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.inzight.dto.request.*;
 import org.inzight.dto.response.UserResponse;
 import org.inzight.entity.User;
+import org.inzight.entity.Wallet;
 import org.inzight.enums.RoleName;
 import org.inzight.repository.UserRepository;
+import org.inzight.repository.WalletRepository;
 import org.inzight.security.AuthUtil;
+
+import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final WalletRepository walletRepository;
     private final AuthUtil authUtil;
 
     private final PasswordEncoder passwordEncoder;
@@ -243,6 +248,16 @@ public class UserService {
                 .build();
 
         User savedUser = userRepository.save(user);
+        
+        // Tự động tạo wallet "Transfer" cho user mới
+        Wallet defaultWallet = Wallet.builder()
+                .user(savedUser)
+                .name("Transfer")
+                .balance(BigDecimal.ZERO)
+                .currency("VND")
+                .build();
+        walletRepository.save(defaultWallet);
+        
         return mapToResponse(savedUser);
     }
 

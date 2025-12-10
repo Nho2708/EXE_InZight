@@ -145,6 +145,10 @@ app:
     icon-base-url: /icons/
     mail:
         sender: nhontqse151350@fpt.edu.vn
+    # Cấu hình upload file
+    upload-dir: uploads
+    # base-url: để trống để tự động detect từ request, hoặc set ngrok URL nếu cần
+    # base-url: https://maynard-unphysical-planographically.ngrok-free.dev
 ai:
     bot-id: 24
 

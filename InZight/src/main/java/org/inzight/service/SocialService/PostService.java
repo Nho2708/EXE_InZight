@@ -14,8 +14,10 @@ import org.inzight.repository.LikeRepository;
 import org.inzight.repository.PostRepository;
 import org.inzight.repository.UserRepository;
 import org.inzight.security.AuthUtil;
+import org.inzight.service.FileStorageService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.inzight.mapper.PostMapper;
 
 import java.util.List;
@@ -30,7 +32,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final PostMapper postMapper;
-
+    private final FileStorageService fileStorageService;
     private final AuthUtil authUtil;
 
     public List<PostResponse> getAll(UserDetails userDetails) {
@@ -50,17 +52,37 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse createPost(PostRequest request) {
+    public PostResponse createPost(PostRequest request, MultipartFile imageFile) {
         try {
             Long currentUserId = authUtil.getCurrentUserId();
 
             User currentUser = userRepository.findById(currentUserId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
+            // Upload ảnh nếu có
+            String imageUrl = null;
+            if (imageFile != null && !imageFile.isEmpty()) {
+                // Kiểm tra xem có phải là URI content:// không (từ client cũ)
+                String requestImageUrl = request.getImageUrl();
+                if (requestImageUrl != null && 
+                    (requestImageUrl.startsWith("http://") || requestImageUrl.startsWith("https://"))) {
+                    // Nếu đã là URL hợp lệ, giữ nguyên
+                    imageUrl = requestImageUrl;
+                } else {
+                    // Upload file mới
+                    imageUrl = fileStorageService.uploadFile(imageFile, "posts");
+                }
+            } else if (request.getImageUrl() != null && 
+                       (request.getImageUrl().startsWith("http://") || request.getImageUrl().startsWith("https://"))) {
+                // Nếu không có file nhưng có URL hợp lệ trong request, dùng URL đó
+                imageUrl = request.getImageUrl();
+            }
+            // Nếu là URI content:// hoặc file://, bỏ qua (không hợp lệ)
+
             Post post = Post.builder()
                     .user(currentUser)
                     .content(request.getContent())
-                    .imageUrl(request.getImageUrl())
+                    .imageUrl(imageUrl)
                     .build();
 
             Post saved = postRepository.save(post);
@@ -74,7 +96,7 @@ public class PostService {
 
     // Cập nhật post
     @Transactional
-    public PostResponse updatePost(Long postId, PostRequest request) {
+    public PostResponse updatePost(Long postId, PostRequest request, MultipartFile imageFile) {
         try {
             Long currentUserId = authUtil.getCurrentUserId();
 
@@ -86,7 +108,26 @@ public class PostService {
             }
 
             post.setContent(request.getContent());
-            post.setImageUrl(request.getImageUrl());
+
+            // Xử lý ảnh: nếu có file mới thì upload, nếu không thì giữ nguyên hoặc dùng URL từ request
+            if (imageFile != null && !imageFile.isEmpty()) {
+                // Xóa ảnh cũ nếu có (tùy chọn)
+                if (post.getImageUrl() != null && post.getImageUrl().contains("/api/files/posts/")) {
+                    try {
+                        String oldFilename = post.getImageUrl().substring(post.getImageUrl().lastIndexOf("/") + 1);
+                        fileStorageService.deleteFile("posts", oldFilename);
+                    } catch (Exception e) {
+                        log.warn("Could not delete old image", e);
+                    }
+                }
+                // Upload ảnh mới
+                post.setImageUrl(fileStorageService.uploadFile(imageFile, "posts"));
+            } else if (request.getImageUrl() != null && 
+                       (request.getImageUrl().startsWith("http://") || request.getImageUrl().startsWith("https://"))) {
+                // Nếu không có file mới nhưng có URL hợp lệ trong request, cập nhật URL
+                post.setImageUrl(request.getImageUrl());
+            }
+            // Nếu không có gì, giữ nguyên ảnh cũ
 
             Post updated = postRepository.save(post);
             return postMapper.toResponse(updated);
