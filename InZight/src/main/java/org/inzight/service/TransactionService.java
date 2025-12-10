@@ -46,13 +46,32 @@ public class TransactionService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        Transaction transaction = Transaction.builder()
+        Transaction.TransactionBuilder builder = Transaction.builder()
                 .wallet(wallet)
                 .category(category)
                 .amount(request.getAmount())
                 .type(TransactionType.valueOf(request.getType()))
-                .note(request.getNote())
-                .build();
+                .note(request.getNote());
+        
+        // Set transactionDate nếu có từ request
+        if (request.getTransactionDate() != null) {
+            try {
+                // Nếu request.getTransactionDate() là Instant, dùng trực tiếp
+                // Nếu là String, parse từ ISO-8601 format
+                Instant txDate;
+                if (request.getTransactionDate() instanceof Instant) {
+                    txDate = (Instant) request.getTransactionDate();
+                } else {
+                    txDate = Instant.parse(request.getTransactionDate().toString());
+                }
+                builder.transactionDate(txDate);
+            } catch (Exception e) {
+                log.warn("Invalid transactionDate format: {}, using current time", request.getTransactionDate());
+                // Sẽ dùng default từ @PrePersist
+            }
+        }
+        
+        Transaction transaction = builder.build();
 
         // Update wallet balance
         if (transaction.getType() == TransactionType.INCOME)
