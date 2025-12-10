@@ -77,7 +77,7 @@ public class ChatMessageService {
     }
 
     /**
-     * Gửi tin nhắn AI: gọi Gemini API, lưu DB, push realtime.
+     * Gửi tin nhắn AI: lưu tin nhắn user, gọi Gemini API, lưu reply, push realtime.
      */
     public ChatMessageResponse sendAiMessage(String content) {
         try {
@@ -90,28 +90,47 @@ public class ChatMessageService {
 
             String userText = Optional.ofNullable(content).orElse("").trim();
             
-            // Gọi Gemini AI
+            // Lưu tin nhắn của user trước
+            if (!userText.isEmpty()) {
+                ChatMessage userMessage = ChatMessage.builder()
+                        .sender(currentUser)
+                        .receiver(finbot)
+                        .content(userText)
+                        .createdAt(Instant.now())
+                        .build();
+                chatMessageRepository.save(userMessage);
+                
+                // Push user message realtime
+                ChatMessageResponse userMsgDto = mapToResponse(userMessage);
+                messagingTemplate.convertAndSend("/topic/chat/" + currentUserId, userMsgDto);
+            }
+            
+            // Gọi Gemini AI - chỉ trả về reply thực sự từ AI, không có fallback message
             String reply = geminiAiService.generateReply(userText)
                     .filter(r -> !r.isBlank())
-                    .orElseGet(() -> userText.isEmpty()
-                            ? "Chào bạn, mình là Finbot. Hãy cho mình biết chi tiêu của bạn nhé!"
-                            : "Mình đã ghi nhận: \"" + userText + "\". Bạn muốn thêm chi tiết nào khác không?");
+                    .orElse(null);
+            
+            // Chỉ lưu reply nếu có (không có fallback message nữa)
+            if (reply != null && !reply.isEmpty()) {
+                ChatMessage aiEntity = ChatMessage.builder()
+                        .sender(finbot)
+                        .receiver(currentUser)
+                        .content(reply)
+                        .createdAt(Instant.now())
+                        .build();
 
-            ChatMessage aiEntity = ChatMessage.builder()
-                    .sender(finbot)
-                    .receiver(currentUser)
-                    .content(reply)
-                    .createdAt(Instant.now())
-                    .build();
+                chatMessageRepository.save(aiEntity);
 
-            chatMessageRepository.save(aiEntity);
+                ChatMessageResponse ai = mapToResponse(aiEntity);
 
-            ChatMessageResponse ai = mapToResponse(aiEntity);
-
-            // Push realtime
-            messagingTemplate.convertAndSend("/topic/chat/" + currentUserId, ai);
-            // Trả về cho REST fallback
-            return ai;
+                // Push realtime
+                messagingTemplate.convertAndSend("/topic/chat/" + currentUserId, ai);
+                // Trả về cho REST fallback
+                return ai;
+            }
+            
+            // Nếu không có reply từ AI, trả về null (frontend sẽ không hiển thị gì)
+            return null;
         } catch (Exception e) {
             throw new RuntimeException("Failed to send AI message: " + e.getMessage(), e);
         }
