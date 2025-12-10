@@ -37,12 +37,19 @@ public class PaymentService {
         Long userId = authUtil.getCurrentUserId();
         Long orderCode = userId * 1_000_000 + new Random().nextInt(999_999);
 
+        // Lấy thông tin người mua để đẩy lên PayOS
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         CreatePaymentLinkRequest request = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
                 .amount(amount)
                 .description("Upgrade Premium: " + plan)
-                .returnUrl("https://yourdomain.com/payment-success")
-                .cancelUrl("https://yourdomain.com/payment-cancel")
+                .buyerName(user.getFullName() != null ? user.getFullName() : user.getUsername())
+                .buyerEmail(user.getEmail())
+                // Deep link để app nhận callback và điều hướng về Home
+                .returnUrl("inzight://payos/payment-success")
+                .cancelUrl("inzight://payos/payment-cancel")
                 .expiredAt((System.currentTimeMillis() / 1000) + 900)
                 .build();
 

@@ -79,16 +79,16 @@
 
 spring:
     # Cấu hình Database (Giữ nguyên)
-#    datasource:
-#        url: jdbc:mysql://localhost:3307/InZightApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
-#        username: root
-#        password: 12345
-#        driver-class-name: com.mysql.cj.jdbc.Driver
     datasource:
-            url: jdbc:mysql://yamanote.proxy.rlwy.net:15119/railway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
-            username: root
-            password: ubHidNSGDsFSwDUwnDrFKyZCgoOILqNu
-            driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3307/InZightApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+        username: root
+        password: 12345
+        driver-class-name: com.mysql.cj.jdbc.Driver
+#    datasource:
+#            url: jdbc:mysql://yamanote.proxy.rlwy.net:15119/railway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+#            username: root
+#            password: ubHidNSGDsFSwDUwnDrFKyZCgoOILqNu
+#            driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
         hibernate:
             ddl-auto: update
@@ -145,3 +145,10 @@ app:
     icon-base-url: /icons/
     mail:
         sender: nhontqse151350@fpt.edu.vn
+ai:
+    bot-id: 24
+
+# Gemini API key (đặt qua ENV hoặc file cấu hình riêng, KHÔNG commit key thật)
+gemini:
+   api:
+     key: AIzaSyAVdry9DbsEKX_oNqWwRIlXTxSvQ1r0lUs

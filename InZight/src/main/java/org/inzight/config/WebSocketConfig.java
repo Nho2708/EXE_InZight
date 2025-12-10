@@ -17,9 +17,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Đây là endpoint FE sẽ connect tới: /ws
+        // Native WebSocket endpoint cho mobile/web client
         registry.addEndpoint("/ws")
-                .addInterceptors(new JwtHandshakeInterceptor(jwtUtil)) // ✅ Thêm interceptor kiểm JWT
+                .addInterceptors(new JwtHandshakeInterceptor(jwtUtil))
+                .setAllowedOriginPatterns("*");
+
+        // SockJS fallback (nếu cần dùng từ web cũ)
+        registry.addEndpoint("/ws-sockjs")
+                .addInterceptors(new JwtHandshakeInterceptor(jwtUtil))
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
