@@ -46,8 +46,8 @@ public class SecurityConfig {
                                 "/ws/**",
                                 "/ws/info/**",
                                 "/api/pay/webhook",
-
-                                "/api/pay/create"
+                                "/api/pay/create",
+                                "/api/files/**"  // Cho phép truy cập file ảnh công khai
                         ).permitAll()
 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")   // 👈 THÊM DÒNG NÀY
@@ -58,7 +58,6 @@ public class SecurityConfig {
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }

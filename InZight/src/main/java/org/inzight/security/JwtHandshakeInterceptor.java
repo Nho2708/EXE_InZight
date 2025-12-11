@@ -26,7 +26,15 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                                    Map<String, Object> attributes) throws Exception {
         if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpServletRequest httpRequest = servletRequest.getServletRequest();
-            String token = httpRequest.getParameter("token"); // ví dụ FE gửi ws://localhost:8080/ws?token=...
+            // Ưu tiên token trong header Authorization, fallback query param `token`
+            String authHeader = httpRequest.getHeader("Authorization");
+            String token = null;
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+            }
+            if (token == null) {
+                token = httpRequest.getParameter("token"); // ws://host/ws?token=...
+            }
 
             if (token != null && jwtUtil.validateToken(token)) {
                 String username = jwtUtil.extractUsername(token);

@@ -16,4 +16,5 @@ public class UserResponse {
     private LocalDate dateOfBirth;
     private String gender;
     private RoleName role;
+    private String rank;
 }

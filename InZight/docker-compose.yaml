@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 12345
-      MYSQL_DATABASE: InZightApp
+      MYSQL_DATABASE: railway
     ports:
       - "3307:3306"   # Host (IntelliJ) sẽ connect qua localhost:3307
     volumes:

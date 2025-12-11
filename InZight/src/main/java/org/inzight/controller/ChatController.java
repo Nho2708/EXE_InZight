@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.inzight.dto.request.ChatMessageRequest;
 import org.inzight.dto.response.ChatMessageResponse;
-import org.inzight.entity.ChatMessage;
 import org.inzight.service.SocialService.ChatMessageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +24,14 @@ public class ChatController {
     }
 
     @PostMapping("/send")
-    public ResponseEntity<Void> sendMessage(@RequestBody ChatMessageRequest request) {
-        chatMessageService.sendMessage(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ChatMessageResponse> sendMessage(@RequestBody ChatMessageRequest request) {
+        ChatMessageResponse saved = chatMessageService.sendMessage(request);
+        return ResponseEntity.ok(saved);
+    }
+
+    @PostMapping("/ai")
+    public ResponseEntity<ChatMessageResponse> chatWithAi(@RequestBody ChatMessageRequest request) {
+        ChatMessageResponse ai = chatMessageService.sendAiMessage(request.getContent());
+        return ResponseEntity.ok(ai);
     }
 }

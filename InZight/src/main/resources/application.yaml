@@ -1,3 +1,80 @@
+## FILE: src/main/resources/application.yml (hoặc .yaml)
+#
+#spring:
+#    # Cấu hình Database (Giữ nguyên)
+#    datasource:
+#        url: jdbc:mysql://yamanote.proxy.rlwy.net:15119/railway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+#        username: root
+#        password: ubHidNSGDsFSwDUwnDrFKyZCgoOILqNu
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#    jpa:
+#        hibernate:
+#            ddl-auto: update
+#        show-sql: true
+#        properties:
+#            hibernate:
+#                format_sql: true
+#        defer-datasource-initialization: true
+#
+#    sql:
+#        init:
+#            mode: never
+#            schema-locations: classpath:schema.sql
+#            data-locations: classpath:data.sql
+#
+#    # >>> CẤU HÌNH MAIL ĐÃ KHẮC PHỤC (Nằm dưới 'spring') <<<
+##    mail:
+##        host: smtp.gmail.com
+##        port: 587
+##        username: ${SPRING_MAIL_USERNAME}
+##        password: ${SPRING_MAIL_PASSWORD}
+##        properties:
+##            mail:
+##                smtp:
+##                    auth: true
+##                    starttls:
+##                        enable: true
+##                        required: true
+##                    connectiontimeout: 5000
+##                    timeout: 5000
+##                    writetimeout: 5000
+#    payos:
+#        client-id: ${PAYOS_CLIENT_ID}
+#        api-key: ${PAYOS_API_KEY}
+#        checksum-key: ${PAYOS_CHECKSUM_KEY}
+#    resend:
+#        api-key: ${RESEND_API_KEY}
+#        sender: no-reply@yourdomain.com
+#
+#    data:
+#        redis:
+#            host: ${REDIS_HOST:localhost} # Mặc định là localhost nếu không có biến môi trường
+#            port: ${REDIS_PORT:6379}
+#            password: ${REDIS_PASSWORD:}  # Để trống nếu không có pass
+#
+## Cấu hình Server (Giữ nguyên)
+#server:
+#    port: ${PORT:8080}
+#    forward-headers-strategy: framework
+#
+## Cấu hình SpringDoc/Swagger (Giữ nguyên)
+#springdoc:
+#    api-docs:
+#        enabled: true
+#        path: /v3/api-docs
+#    swagger-ui:
+#        enabled: true
+#        path: /swagger-ui.html
+#        tags-sorter: alpha
+#
+## Cấu hình app riêng
+#app:
+#    icon-base-url: /icons/
+#    mail:
+#        sender: ${APP_MAIL_SENDER}
+#
+
+
 # FILE: src/main/resources/application.yml (hoặc .yaml)
 
 spring:
@@ -7,6 +84,11 @@ spring:
         username: root
         password: 12345
         driver-class-name: com.mysql.cj.jdbc.Driver
+#    datasource:
+#            url: jdbc:mysql://yamanote.proxy.rlwy.net:15119/railway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+#            username: root
+#            password: ubHidNSGDsFSwDUwnDrFKyZCgoOILqNu
+#            driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
         hibernate:
             ddl-auto: update
@@ -26,8 +108,8 @@ spring:
     mail:
         host: smtp.gmail.com
         port: 587
-        username: nhontqse151350@fpt.edu.vn # Email hệ thống (Người gửi)
-        password: odcx jvrw bkxp cstu        # Mật khẩu Ứng dụng (App Password)
+        username: nhontqse151350@fpt.edu.vn
+        password: odcxjvrwbkxpcstu
         properties:
             mail:
                 smtp:
@@ -39,9 +121,9 @@ spring:
                     timeout: 5000
                     writetimeout: 5000
     payos:
-        client-id: "ab0c2f76-05c3-46cc-a5cd-44cb7927d0fe"
-        api-key: "049ce78b-40aa-452d-83a8-f5e8bd9d2ea3"
-        checksum-key: "ee84ecf1be64d1cb29945a8cb2140d5dc0a11ded055f8d3087d88aa66ee97184"
+        client-id: ab0c2f76-05c3-46cc-a5cd-44cb7927d0fe
+        api-key: 049ce78b-40aa-452d-83a8-f5e8bd9d2ea3
+        checksum-key: ee84ecf1be64d1cb29945a8cb2140d5dc0a11ded055f8d3087d88aa66ee97184
 
 # Cấu hình Server (Giữ nguyên)
 server:
@@ -62,6 +144,15 @@ springdoc:
 app:
     icon-base-url: /icons/
     mail:
-        sender: nhontqse151350@fpt.edu.vn # Email hiển thị trong trường FROM
+        sender: nhontqse151350@fpt.edu.vn
+    # Cấu hình upload file
+    upload-dir: uploads
+    # base-url: để trống để tự động detect từ request, hoặc set ngrok URL nếu cần
+    # base-url: https://maynard-unphysical-planographically.ngrok-free.dev
+ai:
+    bot-id: 24
 
-
+# Gemini API key (đặt qua ENV hoặc file cấu hình riêng, KHÔNG commit key thật)
+gemini:
+   api:
+     key: AIzaSyAVdry9DbsEKX_oNqWwRIlXTxSvQ1r0lUs

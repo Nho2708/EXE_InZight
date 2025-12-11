@@ -4,9 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.inzight.dto.request.*;
 import org.inzight.dto.response.UserResponse;
 import org.inzight.entity.User;
+import org.inzight.entity.Wallet;
 import org.inzight.enums.RoleName;
 import org.inzight.repository.UserRepository;
+import org.inzight.repository.WalletRepository;
 import org.inzight.security.AuthUtil;
+
+import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final WalletRepository walletRepository;
     private final AuthUtil authUtil;
 
     private final PasswordEncoder passwordEncoder;
@@ -50,7 +55,13 @@ public class UserService {
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return mapToResponse(user);
+        System.out.println("🔍 UserService.getCurrentUser - User ID: " + currentUserId);
+        System.out.println("🔍 UserService.getCurrentUser - User rank from DB: " + user.getRank());
+        
+        UserResponse response = mapToResponse(user);
+        System.out.println("🔍 UserService.getCurrentUser - Response rank: " + response.getRank());
+        
+        return response;
     }
 
     //  Helper để map entity → DTO
@@ -65,6 +76,14 @@ public class UserService {
         res.setDateOfBirth(user.getDateOfBirth());
         res.setGender(user.getGender());
         res.setRole(user.getRole());
+        
+        // Map rank từ User entity
+        String rank = user.getRank() != null ? user.getRank() : "FREE";
+        res.setRank(rank);
+        
+        // Log để debug
+        System.out.println("🔍 UserService.mapToResponse - User ID: " + user.getId() + ", Username: " + user.getUsername() + ", Rank: " + rank);
+        
         return res;
     }
 
@@ -229,6 +248,16 @@ public class UserService {
                 .build();
 
         User savedUser = userRepository.save(user);
+        
+        // Tự động tạo wallet "Transfer" cho user mới
+        Wallet defaultWallet = Wallet.builder()
+                .user(savedUser)
+                .name("Transfer")
+                .balance(BigDecimal.ZERO)
+                .currency("VND")
+                .build();
+        walletRepository.save(defaultWallet);
+        
         return mapToResponse(savedUser);
     }
 

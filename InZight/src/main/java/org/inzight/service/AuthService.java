@@ -6,9 +6,13 @@ import org.inzight.dto.request.RegisterRequest;
 import org.inzight.dto.response.AuthResponse;
 import org.inzight.dto.response.RegisterResponse;
 import org.inzight.entity.User;
+import org.inzight.entity.Wallet;
 import org.inzight.enums.RoleName;
 import org.inzight.repository.UserRepository;
+import org.inzight.repository.WalletRepository;
 import org.inzight.security.JwtUtil;
+
+import java.math.BigDecimal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final WalletRepository walletRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
@@ -44,6 +49,15 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+
+        // Tự động tạo wallet "Transfer" cho user mới
+        Wallet defaultWallet = Wallet.builder()
+                .user(user)
+                .name("Transfer")
+                .balance(BigDecimal.ZERO)
+                .currency("VND")
+                .build();
+        walletRepository.save(defaultWallet);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String token = jwtUtil.generateToken(user);
