@@ -191,13 +191,13 @@ public class FinanceService {
     
     private String getPresetName(String preset) {
         switch (preset) {
-            case "inflation_low": return "Lạm phát thấp";
-            case "inflation_high": return "Lạm phát cao";
-            case "crisis_light": return "Khủng hoảng nhẹ";
-            case "crisis_medium": return "Khủng hoảng trung bình";
-            case "crisis_severe": return "Khủng hoảng nghiêm trọng";
-            case "pandemic": return "Đại dịch";
-            default: return "Kịch bản mặc định";
+            case "inflation_low": return "Low Inflation";
+            case "inflation_high": return "High Inflation";
+            case "crisis_light": return "Light Crisis";
+            case "crisis_medium": return "Medium Crisis";
+            case "crisis_severe": return "Severe Crisis";
+            case "pandemic": return "Pandemic";
+            default: return "Default Scenario";
         }
     }
 
